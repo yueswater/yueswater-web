@@ -105,7 +105,9 @@ export function Navbar() {
                     showUserMenu ? "ring-primary scale-110 rotate-12" : ""
                   }`}
                 >
-                  <div className="border-base-300 ring-offset-base-100 hover:ring-primary/50 h-9 w-9 rounded-full border ring-offset-2 transition-all md:h-10 md:w-10">
+                  <div className={`h-9 w-9 rounded-full ring-offset-base-100 ring-offset-2 transition-all md:h-10 md:w-10 overflow-hidden ${
+                      showUserMenu ? "ring-2 ring-primary" : "ring-1 ring-base-200 hover:ring-2 hover:ring-primary/50"
+                    }`}>
                     {user.avatar ? (
                       <Image
                         src={user.avatar}
