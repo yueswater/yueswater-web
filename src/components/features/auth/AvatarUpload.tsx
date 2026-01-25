@@ -36,7 +36,7 @@ export function AvatarUpload() {
 
   return (
     <div className="relative mx-auto mb-6 h-36 w-36">
-      <div className="h-full w-full overflow-hidden rounded-full ring-8 ring-base-100">
+      <div className="h-full w-full overflow-hidden rounded-full">
         {user?.avatar ? (
           <Image src={user.avatar} alt="頭像" fill className="object-cover" />
         ) : (
