@@ -22,7 +22,6 @@ export function UserProfileSidebar({ isOpen, onClose }: UserProfileSidebarProps)
     <AnimatePresence>
       {user && isOpen && (
         <>
-          {/* 背景遮罩 - 使用 backdrop-blur-md 讓內容清晰可見 */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -32,7 +31,6 @@ export function UserProfileSidebar({ isOpen, onClose }: UserProfileSidebarProps)
             onClick={onClose}
           />
 
-          {/* 側邊欄 - 統一 backdrop-blur-md */}
           <motion.div
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -49,13 +47,12 @@ export function UserProfileSidebar({ isOpen, onClose }: UserProfileSidebarProps)
             }}
           >
             <style>{`
-                            .scrollbar-hide::-webkit-scrollbar {
-                                display: none;
-                            }
-                        `}</style>
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
 
             <div className="flex h-full flex-col">
-              {/* 頂部：關閉按鈕與用戶資訊 */}
               <div className="mb-8 flex flex-col items-end space-y-6">
                 <motion.button
                   onClick={onClose}
@@ -80,12 +77,10 @@ export function UserProfileSidebar({ isOpen, onClose }: UserProfileSidebarProps)
                 </motion.div>
               </div>
 
-              {/* 中間：選單 */}
               <nav className="flex flex-1 flex-col items-end space-y-2">
                 {[
                   { label: "個人檔案", href: "/profile", delay: 0.3 },
                   { label: "我的收藏", href: "/favorites", delay: 0.35 },
-                  { label: "帳號設定", href: "/settings", delay: 0.4 },
                 ].map((item) => (
                   <motion.div
                     key={item.href}
@@ -105,7 +100,6 @@ export function UserProfileSidebar({ isOpen, onClose }: UserProfileSidebarProps)
                 ))}
               </nav>
 
-              {/* 底部：登出 */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
