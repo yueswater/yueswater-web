@@ -59,7 +59,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+    <div className="flex min-h-[calc(100vh-4rem)] items-start justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
           <div className="bg-transparent text-base-100 mx-auto w-fit rounded-2xl p-3">
