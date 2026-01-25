@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Camera, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { authService } from "@/services/authService";
 
 export function AvatarUpload() {
   const { user } = useAuth();
@@ -12,31 +13,52 @@ export function AvatarUpload() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("圖片大小不能超過 2MB");
+      return;
+    }
+
     setUploading(true);
-    // 此處應實作上傳邏輯
-    setTimeout(() => setUploading(false), 1500);
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const updatedUser = await authService.updateAvatar(formData);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      window.location.reload();
+    } catch (err: any) {
+      alert("上傳失敗：" + err.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
-    <div className="relative">
-      <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-base-200 shadow-md">
+    <div className="relative mx-auto mb-6 h-36 w-36">
+      <div className="h-full w-full overflow-hidden rounded-full ring-8 ring-base-100">
         {user?.avatar ? (
-          <Image src={user.avatar} alt="Avatar" width={128} height={128} className="object-cover" />
+          <Image src={user.avatar} alt="頭像" fill className="object-cover" />
         ) : (
-          <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center text-3xl font-bold">
+          <div className="flex h-full w-full items-center justify-center bg-primary/10 text-5xl font-black text-primary">
             {user?.username?.charAt(0).toUpperCase()}
           </div>
         )}
       </div>
-      <label className="btn btn-primary btn-circle btn-sm absolute right-0 bottom-0 shadow-lg cursor-pointer">
-        <Camera className="h-4 w-4" />
-        <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+      <label className="btn btn-primary btn-circle btn-sm absolute bottom-1 right-1 cursor-pointer border-none">
+        {uploading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Camera className="h-4 w-4" />
+        )}
+        <input
+          type="file"
+          className="hidden"
+          accept="image/*"
+          onChange={handleFileChange}
+          disabled={uploading}
+        />
       </label>
-      {uploading && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
-          <Loader2 className="h-8 w-8 animate-spin text-white" />
-        </div>
-      )}
     </div>
   );
 }
