@@ -34,4 +34,18 @@ export const authService = {
       body: JSON.stringify({ refresh }),
     });
   },
+
+  requestPasswordReset: async (email: string) => {
+    return apiClient<{ detail: string }>("/auth/password-reset/", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  resetPasswordConfirm: async (data: Record<string, string>) => {
+    return apiClient<{ detail: string }>("/auth/password-reset-confirm/", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
 };
