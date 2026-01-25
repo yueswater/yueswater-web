@@ -74,9 +74,9 @@ export function UserProfileSidebar({ isOpen, onClose }: UserProfileSidebarProps)
                   transition={{ delay: 0.2 }}
                 >
                   <p className="text-foreground text-xl font-bold tracking-tight">
-                    {user.username}
+                    {user?.username || "用戶"}
                   </p>
-                  <p className="text-foreground/50 text-sm font-medium">{user.email}</p>
+                  <p className="text-foreground/50 text-sm font-medium">{user?.email || ""}</p>
                 </motion.div>
               </div>
 

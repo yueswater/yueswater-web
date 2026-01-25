@@ -117,7 +117,7 @@ export function Navbar() {
                       />
                     ) : (
                       <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center text-sm font-bold">
-                        {user.username.charAt(0).toUpperCase()}
+                        {(user?.username?.charAt(0) || "U").toUpperCase()}
                       </div>
                     )}
                   </div>
