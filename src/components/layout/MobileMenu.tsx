@@ -5,7 +5,6 @@ import Image from "next/image";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { X, LogIn, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-// 1. 引入 ThemeToggle
 import { ThemeToggle } from "@/components/features/theme/ThemeToggle";
 
 interface MobileMenuProps {
@@ -49,16 +48,14 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
           variants={menuVariants}
           className="bg-base-100/90 supports-[backdrop-filter]:bg-base-100/60 fixed inset-0 z-[60] flex flex-col backdrop-blur-xl"
         >
-          {/* 2. 頂部功能區：改為左右對齊 (左邊主題切換，右邊關閉) */}
           <div className="border-base-content/5 flex items-center justify-between border-b p-6">
             <ThemeToggle />
 
-            <button onClick={onClose} className="btn btn-ghost btn-circle" aria-label="關閉選單">
+            <button onClick={onClose} className="btn btn-ghost btn-circle" aria-label="Close menu">
               <X className="text-base-content h-8 w-8" />
             </button>
           </div>
 
-          {/* 中間導航連結 */}
           <nav className="flex flex-1 flex-col items-center justify-center gap-8">
             {navItems.map((item, i) => (
               <motion.div key={item.name} custom={i} variants={listVariants}>
@@ -73,7 +70,6 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
             ))}
           </nav>
 
-          {/* 底部使用者資訊 */}
           <div className="border-base-content/10 bg-base-200/50 border-t p-8 backdrop-blur-md">
             {user ? (
               <div className="flex items-center justify-between">
@@ -99,7 +95,7 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
                   <div className="flex flex-col">
                     <span className="text-base-content text-lg font-bold">{user.username}</span>
                     <span className="text-base-content/60 text-sm">
-                      {user.email || "尚無電子郵件"}
+                      {user.email || "No email provided"}
                     </span>
                   </div>
                 </div>
@@ -110,7 +106,7 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
                     onClose();
                   }}
                   className="btn btn-ghost btn-circle text-error"
-                  aria-label="登出"
+                  aria-label="Logout"
                 >
                   <LogOut className="h-6 w-6" />
                 </button>
@@ -119,10 +115,10 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
               <Link
                 href="/login"
                 onClick={onClose}
-                className="btn btn-primary w-full rounded-full text-lg"
+                className="btn btn-primary w-full flex-row items-center justify-center rounded-full text-lg flex gap-2"
               >
-                <LogIn className="mr-2 h-5 w-5" />
-                登入 / 註冊
+                <LogIn className="h-5 w-5" />
+                <span>登入 / 註冊</span>
               </Link>
             )}
           </div>
