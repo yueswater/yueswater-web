@@ -44,9 +44,9 @@ export function AvatarUpload() {
 
   return (
     <div className="relative mx-auto mb-6 h-36 w-36">
-      <div className="h-full w-full overflow-hidden rounded-full">
+      <div className="h-full w-full overflow-hidden rounded-full ring-2 ring-base-100 bg-base-200">
         {user?.avatar ? (
-          <Image src={user.avatar} alt="頭像" fill className="object-cover" />
+          <Image src={user.avatar} alt="頭像" fill className="object-cover rounded-full" />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-primary/10 text-5xl font-black text-primary">
             {user?.username?.charAt(0).toUpperCase()}
@@ -56,9 +56,9 @@ export function AvatarUpload() {
 
       <label className="btn btn-primary btn-circle btn-sm absolute bottom-1 right-1 cursor-pointer border-none shadow-none">
         {uploading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Loader2 className="h-4 w-4 animate-spin text-white" />
         ) : (
-          <Camera className="h-4 w-4" />
+          <Camera className="h-4 w-4 text-white" />
         )}
         <input
           type="file"

@@ -58,8 +58,8 @@ export function ImageCropper({ image, onCropComplete, onCancel }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/60 backdrop-blur-md p-4">
-      <div className="relative h-[450px] w-full max-w-xl overflow-hidden rounded-[2.5rem] bg-base-300 border-4 border-white/20">
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/70 backdrop-blur-md p-4">
+      <div className="relative h-[450px] w-full max-w-xl overflow-hidden rounded-[2.5rem] bg-base-300 border-4 border-white/20 shadow-none">
         <Cropper
           image={image}
           crop={crop}
@@ -74,8 +74,11 @@ export function ImageCropper({ image, onCropComplete, onCancel }: Props) {
       </div>
 
       <div className="mt-10 flex w-full max-w-xl flex-col gap-8 px-6">
-        <div className="flex items-center gap-4 bg-white/10 p-4 rounded-2xl">
-          <span className="text-white text-xs font-bold whitespace-nowrap">縮放</span>
+        <div className="flex flex-col gap-4 bg-white/10 p-6 rounded-[2rem] border border-white/5">
+          <div className="flex justify-between items-center px-1">
+            <span className="text-white text-xs font-black uppercase tracking-widest">Zoom</span>
+            <span className="text-accent text-xs font-black">{Math.round(zoom * 100)}%</span>
+          </div>
           <input
             type="range"
             value={zoom}
@@ -83,22 +86,22 @@ export function ImageCropper({ image, onCropComplete, onCancel }: Props) {
             max={3}
             step={0.1}
             onChange={(e) => setZoom(Number(e.target.value))}
-            className="range range-primary range-xs"
+            className="range range-accent range-sm w-full"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-6">
           <button 
             onClick={onCancel} 
-            className="btn btn-ghost h-14 rounded-2xl text-white font-bold text-lg hover:bg-white/10 border-2 border-white/20"
+            className="btn btn-ghost h-16 rounded-full text-white font-bold text-lg hover:bg-white/10 border-2 border-white/20 shadow-none"
           >
-            取消返回
+            取消
           </button>
           <button 
             onClick={createCroppedImage} 
-            className="btn btn-primary h-14 rounded-2xl text-white font-black text-lg shadow-none border-none"
+            className="btn btn-primary h-16 rounded-full text-white font-black text-lg border-none shadow-none"
           >
-            確認裁剪並上傳
+            確認並上傳
           </button>
         </div>
       </div>
