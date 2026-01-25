@@ -8,14 +8,13 @@ import { SearchModal } from "@/components/features/search/SearchModal";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect, useRef } from "react";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu, LogIn } from "lucide-react";
 
 export function Navbar() {
   const { user } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -43,7 +42,6 @@ export function Navbar() {
     { name: "文章總覽", href: "/" },
     { name: "分類", href: "/categories" },
     { name: "標籤", href: "/tags" },
-    
     { name: "關於", href: "/about" },
   ];
 
@@ -52,17 +50,14 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`bg-base-100/95 fixed top-0 right-0 left-0 z-50 w-full backdrop-blur-md transition-all duration-300 ${isScrolled ? "" : "border-b"} border-base-200 ${
-          isScrolled ? "" : ""
-        }`}
+        className={`bg-base-100/95 fixed top-0 right-0 left-0 z-50 w-full backdrop-blur-md transition-all duration-300 ${
+          isScrolled ? "" : "border-b"
+        } border-base-200`}
       >
         <div className="flex w-full flex-col">
-          {/* --- 第一層：Logo 與 功能區 --- */}
           <div className="relative flex items-center justify-between px-6 py-4 transition-all duration-300 md:py-6">
-            {/* 左側：漢堡選單按鈕 */}
             <div className="flex flex-1 justify-start">
               <button
-                
                 onClick={() => setIsMobileMenuOpen(true)}
                 className="btn btn-ghost btn-circle btn-sm md:hidden"
               >
@@ -70,19 +65,18 @@ export function Navbar() {
               </button>
             </div>
 
-            {/* 中間：Logo */}
             <Link href="/" className="group flex shrink-0 flex-col items-center gap-1">
               <div className="relative h-10 w-32 overflow-hidden md:h-14 md:w-48">
                 <Image
                   src="/logo_lightTheme.png"
-                  alt="岳氏礦泉水 Logo"
+                  alt="Logo"
                   fill
                   className="logo-light object-contain transition-transform duration-500 group-hover:scale-105"
                   priority
                 />
                 <Image
                   src="/logo_darkTheme.png"
-                  alt="岳氏礦泉水 Logo"
+                  alt="Logo"
                   fill
                   className="logo-dark object-contain transition-transform duration-500 group-hover:scale-105"
                   priority
@@ -90,13 +84,12 @@ export function Navbar() {
               </div>
             </Link>
 
-            {/* 右側：功能區 */}
             <div className="flex flex-1 items-center justify-end gap-2 md:gap-4">
               <button
                 ref={searchButtonRef}
                 onClick={() => setIsSearchOpen(true)}
                 className="btn btn-ghost btn-circle btn-sm md:btn-md hover:bg-base-200"
-                aria-label="搜尋"
+                aria-label="Search"
               >
                 <Search className="text-base-content/70 h-5 w-5 md:h-6 md:w-6" />
               </button>
@@ -108,7 +101,9 @@ export function Navbar() {
               {user ? (
                 <button
                   onClick={() => setShowUserMenu(true)}
-                  className={`btn btn-ghost btn-circle avatar ml-1 transition-transform duration-300 ${showUserMenu ? "ring-primary scale-110 rotate-12" : ""}`}
+                  className={`btn btn-ghost btn-circle avatar ml-1 transition-transform duration-300 ${
+                    showUserMenu ? "ring-primary scale-110 rotate-12" : ""
+                  }`}
                 >
                   <div className="border-base-300 ring-offset-base-100 hover:ring-primary/50 h-9 w-9 rounded-full border ring-offset-2 transition-all md:h-10 md:w-10">
                     {user.avatar ? (
@@ -128,8 +123,12 @@ export function Navbar() {
                   </div>
                 </button>
               ) : (
-                <Link href="/login" className="btn btn-primary btn-sm ml-2 rounded-full px-6">
-                  登入
+                <Link
+                  href="/login"
+                  className="btn btn-primary btn-sm ml-2 rounded-full px-4 md:px-6"
+                >
+                  <LogIn className="h-5 w-5 md:hidden" />
+                  <span className="hidden md:block">登入</span>
                 </Link>
               )}
             </div>
@@ -137,7 +136,9 @@ export function Navbar() {
 
           <div
             className={`border-base-200 hidden justify-center overflow-hidden transition-all duration-500 ease-in-out md:flex ${
-              shouldHideNav ? "max-h-0 border-none opacity-0" : "max-h-24 border-t py-4 opacity-100"
+              shouldHideNav
+                ? "max-h-0 border-none opacity-0"
+                : "max-h-24 border-t py-4 opacity-100"
             }`}
           >
             <nav className="flex items-center gap-10">
@@ -166,7 +167,6 @@ export function Navbar() {
         triggerRef={searchButtonRef}
       />
 
-      {/* 4. 掛載 MobileMenu */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
