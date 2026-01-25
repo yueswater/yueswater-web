@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Instagram, Facebook, ArrowRight, Mail } from "lucide-react";
+import { Github, Instagram, Facebook, Mail } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { NewsletterModal } from "@/components/shared/NewsletterModal";
 import { newsletterService } from "@/services/newsletterService";
@@ -65,6 +65,13 @@ export function Footer() {
               */}
 
               <div className="flex items-center gap-2">
+                <a
+                  href="mailto:sungpunyue@gmail.com"
+                  className="text-foreground/60 hover:bg-muted hover:text-primary rounded-full p-2 transition-all"
+                  aria-label="Email"
+                >
+                  <Mail className="h-5 w-5" />
+                </a>
                 <a
                   href="https://github.com/yueswater"
                   target="_blank"
