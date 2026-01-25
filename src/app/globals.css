@@ -1,0 +1,66 @@
+@import "katex/dist/katex.min.css";
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  --background: 255 255 255;
+  --foreground: 15 23 42;
+  --border: 226 232 240;
+}
+
+html[data-theme="emerald"] {
+  --background: 255 255 255;
+  --foreground: 15 23 42;
+  --border: 226 232 240;
+}
+
+html[data-theme="dim"] {
+  --background: 42 48 60;
+  --foreground: 226 232 240;
+  --border: 242 242 242;
+}
+
+html,
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+}
+
+body {
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+.logo-dark {
+  display: none;
+}
+
+.logo-light {
+  display: block;
+}
+
+html[data-theme="dim"] .logo-dark {
+  display: block;
+}
+
+html[data-theme="dim"] .logo-light {
+  display: none;
+}
+
+.math-display,
+.katex-display {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+button,
+input,
+textarea {
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+*,
+::before,
+::after {
+  border-color: rgb(var(--border));
+}
