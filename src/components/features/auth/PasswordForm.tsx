@@ -85,7 +85,7 @@ export function PasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className="btn btn-primary h-auto min-h-0 rounded-[1.25rem] px-14 py-4 text-base font-black shadow-lg shadow-primary/30 transition-all hover:scale-[1.03] active:scale-[0.97]"
+          className="btn btn-primary h-auto min-h-0 rounded-[1.25rem] px-14 py-4 text-base font-black border-none transition-all hover:scale-[1.03] active:scale-[0.98]"
         >
           {loading ? "正在處理..." : "確認修改密碼"}
         </button>

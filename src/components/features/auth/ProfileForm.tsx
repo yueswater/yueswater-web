@@ -67,7 +67,7 @@ export function ProfileForm({ user }: { user: User | null }) {
       <div className="flex justify-end pt-8">
         <button 
           type="submit" 
-          className="btn btn-primary h-auto min-h-0 rounded-[1.25rem] px-14 py-4 text-base font-black shadow-lg shadow-primary/30 transition-all hover:scale-[1.03] active:scale-[0.97]"
+          className="btn btn-primary h-auto min-h-0 rounded-[1.25rem] px-14 py-4 text-base font-black border-none transition-all hover:scale-[1.03] active:scale-[0.98]"
           disabled={loading}
         >
           {loading ? "處理中..." : "儲存並更新資料"}
