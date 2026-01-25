@@ -1,5 +1,5 @@
 import { apiClient } from "./apiClient";
-import { LoginResponse } from "@/types/auth";
+import { LoginResponse, User } from "@/types/auth";
 
 export const authService = {
   login: async (credentials: Record<string, string>) => {
@@ -44,6 +44,27 @@ export const authService = {
 
   resetPasswordConfirm: async (data: Record<string, string>) => {
     return apiClient<{ detail: string }>("/auth/password-reset-confirm/", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateProfile: async (data: Record<string, any>) => {
+    return apiClient<User>("/auth/me/", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateAvatar: async (formData: FormData) => {
+    return apiClient<User>("/auth/me/", {
+      method: "PATCH",
+      body: formData,
+    });
+  },
+
+  changePassword: async (data: Record<string, string>) => {
+    return apiClient<{ detail: string }>("/auth/change-password/", {
       method: "POST",
       body: JSON.stringify(data),
     });

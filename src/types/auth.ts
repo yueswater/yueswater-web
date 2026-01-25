@@ -1,12 +1,3 @@
-// 定義使用者型別
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  avatar: string | null;
-}
-
-// 定義登入回傳型別
 export interface LoginResponse {
   access: string;
   refresh: string;
@@ -14,4 +5,6 @@ export interface LoginResponse {
   username: string;
   email: string;
   avatar: string | null;
+  first_name?: string; 
+  last_name?: string;
 }

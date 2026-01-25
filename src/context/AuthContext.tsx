@@ -1,9 +1,10 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { User, LoginResponse } from "@/types/auth";
 import { authService } from "@/services/authService";
 import { useRouter } from "next/navigation";
+import { User } from "@/types"; 
+import { LoginResponse } from "@/types/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -51,6 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username: data.username,
         email: data.email,
         avatar: data.avatar,
+        first_name: data.first_name || "", 
+        last_name: data.last_name || "",   
       };
 
       localStorage.setItem("user", JSON.stringify(userData));
