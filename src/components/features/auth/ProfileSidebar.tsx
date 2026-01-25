@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import { Camera, User, KeyRound } from "lucide-react";
+import { User, KeyRound } from "lucide-react";
 import { User as UserType } from "@/types";
+import { AvatarUpload } from "./AvatarUpload";
 
 interface Props {
   user: UserType | null;
@@ -14,21 +14,8 @@ export function ProfileSidebar({ user, activeTab, onTabChange }: Props) {
   return (
     <div className="space-y-6">
       <div className="bg-card rounded-[2rem] border border-base-200 p-10 text-center">
-        <div className="relative mx-auto mb-6 h-36 w-36">
-          <div className="h-full w-full overflow-hidden rounded-full ring-8 ring-base-100">
-            {user?.avatar ? (
-              <Image src={user.avatar} alt="頭像" fill className="object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-primary/10 text-5xl font-black text-primary">
-                {user?.username?.charAt(0).toUpperCase()}
-              </div>
-            )}
-          </div>
-          <label className="btn btn-primary btn-circle btn-sm absolute bottom-1 right-1 cursor-pointer border-none">
-            <Camera className="h-4 w-4" />
-            <input type="file" className="hidden" accept="image/*" />
-          </label>
-        </div>
+        <AvatarUpload />
+        
         <h2 className="text-2xl font-black tracking-tight text-foreground">{user?.username}</h2>
         <p className="mt-1 text-sm text-foreground/50">{user?.email}</p>
       </div>
