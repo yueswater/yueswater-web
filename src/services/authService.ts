@@ -23,7 +23,7 @@ export const authService = {
   },
 
   verifyEmail: async (uid: string, token: string) => {
-    return apiClient<{ detail: string }>(`/auth/verify-email?uid=${uid}&token=${token}`, {
+    return apiClient<{ detail: string }>(`/auth/verify-email/?uid=${uid}&token=${token}`, {
       method: "GET",
     });
   },
