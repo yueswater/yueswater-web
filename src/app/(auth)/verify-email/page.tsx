@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState, useRef, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { authService } from "@/services/authService";
 import { Droplets, Loader2, CheckCircle2, XCircle, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
   const verified = useRef(false);
@@ -21,22 +22,33 @@ function VerifyEmailContent() {
 
       if (!uid || !token) {
         setStatus("error");
-        setMessage("Invalid verification link.");
+        setMessage("無效的驗證連結。");
         return;
       }
 
       try {
         verified.current = true;
-        await authService.verifyEmail(uid, token);
+        const response = await authService.verifyEmail(uid, token);
+        
+        if (response.detail === "already_active") {
+          router.push("/login");
+          return;
+        }
+
         setStatus("success");
+        
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
+
       } catch (err: any) {
         setStatus("error");
-        setMessage(err.message || "Verification failed or link expired.");
+        setMessage(err.message || "驗證失敗或連結已過期。");
       }
     };
 
     verify();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   return (
     <div className="bg-card rounded-2xl border border-[color:var(--border)] p-8 shadow-sm space-y-6">
@@ -60,13 +72,13 @@ function VerifyEmailContent() {
 
       <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">
-          {status === "loading" && "Verifying your email..."}
-          {status === "success" && "Account Verified!"}
-          {status === "error" && "Verification Failed"}
+          {status === "loading" && "正在驗證您的電子郵件..."}
+          {status === "success" && "帳號驗證成功！"}
+          {status === "error" && "驗證失敗"}
         </h1>
         <p className="text-foreground/60 text-sm">
-          {status === "loading" && "Please wait while we validate your account."}
-          {status === "success" && "Your account has been successfully activated. You can now log in."}
+          {status === "loading" && "請稍候，我們正在處理您的請求。"}
+          {status === "success" && "您的帳號已成功啟用，3 秒後將自動跳轉至登入頁面。"}
           {status === "error" && message}
         </p>
       </div>
@@ -78,7 +90,7 @@ function VerifyEmailContent() {
             className="bg-primary text-primary-foreground flex w-full items-center justify-center rounded-lg px-4 py-2.5 font-medium transition-all hover:opacity-90"
           >
             <span className="flex items-center gap-2">
-              Go to Login
+              前往登入
               <ArrowRight className="h-4 w-4" />
             </span>
           </Link>
