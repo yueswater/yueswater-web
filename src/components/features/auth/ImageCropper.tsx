@@ -51,43 +51,53 @@ export function ImageCropper({ image, onCropComplete, onCancel }: Props) {
 
       canvas.toBlob((blob) => {
         if (blob) onCropComplete(blob);
-      }, "image/jpeg");
+      }, "image/jpeg", 0.9);
     } catch (e) {
       console.error(e);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 p-4">
-      <div className="relative h-[400px] w-full max-w-lg overflow-hidden rounded-3xl bg-base-300">
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/60 backdrop-blur-md p-4">
+      <div className="relative h-[450px] w-full max-w-xl overflow-hidden rounded-[2.5rem] bg-base-300 border-4 border-white/20">
         <Cropper
           image={image}
           crop={crop}
           zoom={zoom}
           aspect={1 / 1}
+          cropShape="round"
+          showGrid={true}
           onCropChange={onCropChange}
           onCropComplete={onCropCompleteInternal}
           onZoomChange={onZoomChange}
         />
       </div>
 
-      <div className="mt-8 flex w-full max-w-lg flex-col gap-6 px-4">
-        <input
-          type="range"
-          value={zoom}
-          min={1}
-          max={3}
-          step={0.1}
-          aria-labelledby="Zoom"
-          onChange={(e) => setZoom(Number(e.target.value))}
-          className="range range-primary range-sm"
-        />
+      <div className="mt-10 flex w-full max-w-xl flex-col gap-8 px-6">
+        <div className="flex items-center gap-4 bg-white/10 p-4 rounded-2xl">
+          <span className="text-white text-xs font-bold whitespace-nowrap">縮放</span>
+          <input
+            type="range"
+            value={zoom}
+            min={1}
+            max={3}
+            step={0.1}
+            onChange={(e) => setZoom(Number(e.target.value))}
+            className="range range-primary range-xs"
+          />
+        </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <button onClick={onCancel} className="btn btn-ghost rounded-2xl text-white">
-            取消
+        <div className="grid grid-cols-2 gap-6">
+          <button 
+            onClick={onCancel} 
+            className="btn btn-ghost h-14 rounded-2xl text-white font-bold text-lg hover:bg-white/10 border-2 border-white/20"
+          >
+            取消返回
           </button>
-          <button onClick={createCroppedImage} className="btn btn-primary rounded-2xl">
+          <button 
+            onClick={createCroppedImage} 
+            className="btn btn-primary h-14 rounded-2xl text-white font-black text-lg shadow-none border-none"
+          >
             確認裁剪並上傳
           </button>
         </div>
