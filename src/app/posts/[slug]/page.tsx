@@ -65,7 +65,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
           {post.cover_image && (
             <div className="mb-8 overflow-hidden rounded-lg">
               <Image
-                src={getFullImageUrl(post.cover_image).replace("yueswater-server", "localhost")}
+                src={getFullImageUrl(post.cover_image)}
                 alt={post.title}
                 width={800}
                 height={400}
