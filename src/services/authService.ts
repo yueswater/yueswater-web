@@ -16,9 +16,15 @@ export const authService = {
   },
 
   register: async (data: Record<string, string>) => {
-    return apiClient<{ id: number; username: string }>("/auth/register/", {
+    return apiClient<{ id: string; username: string }>("/auth/register/", {
       method: "POST",
       body: JSON.stringify(data),
+    });
+  },
+
+  verifyEmail: async (uid: string, token: string) => {
+    return apiClient<{ detail: string }>(`/auth/verify-email/?uid=${uid}&token=${token}`, {
+      method: "GET",
     });
   },
 

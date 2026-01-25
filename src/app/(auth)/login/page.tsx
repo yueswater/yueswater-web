@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Droplet ,Loader2, ArrowRight, Eye, EyeOff, Droplets } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
@@ -62,21 +62,8 @@ export default function LoginPage() {
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-          <div className="relative mb-4 h-16 w-16 overflow-hidden rounded-2xl">
-            <Image
-              src="/logo_lightTheme.png"
-              alt="岳氏礦泉水 Logo"
-              fill
-              className="logo-light object-contain transition-transform duration-500 group-hover:scale-105"
-              priority
-            />
-            <Image
-              src="/logo_darkTheme.png"
-              alt="岳氏礦泉水 Logo"
-              fill
-              className="logo-dark object-contain transition-transform duration-500 group-hover:scale-105"
-              priority
-            />
+          <div className="bg-transparent text-base-100 mx-auto w-fit rounded-2xl p-3">
+            <Droplets className="h-10 w-10" />
           </div>
           <h1 className="text-foreground text-3xl font-bold tracking-tight">歡迎回來</h1>
           <p className="text-foreground/60 mt-2 text-sm">請輸入您的帳號密碼以繼續</p>

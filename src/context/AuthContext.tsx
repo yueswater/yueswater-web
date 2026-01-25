@@ -9,6 +9,7 @@ interface AuthContextType {
   user: User | null;
   login: (credentials: Record<string, string>) => Promise<void>;
   logout: () => void;
+  register: (data: Record<string, string>) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -62,11 +63,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const register = async (data: Record<string, string>) => {
+    try {
+      await authService.register(data);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
       await authService.logout();
     } catch (error) {
-      console.warn("Logout API failed (likely token expired), forcing local logout.", error);
+      console.warn("Logout failed", error);
     } finally {
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
@@ -79,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
