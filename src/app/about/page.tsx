@@ -3,39 +3,48 @@ import { TableOfContents } from "@/components/features/posts/TableOfContents";
 import Image from "next/image";
 
 const ABOUT_MARKDOWN = `
-## 關於岳氏礦泉水
+> 「技術應如礦泉水般純粹。」
 
-大家好，我是 **岳氏礦泉水**。這是一個專注於全端開發技術分享的部落格。
+我是阿岳，一名穿梭在 Python 後端與 React 前端之間的開發者。比起盲目追求新技術，我更著迷於如何構建穩定、可擴展的系統架構，並將邏輯思維帶入軟體工程中。
 
-我熱愛研究各種技術，包含：
-* **Python / Django / FastAPI**
-* **React / Next.js**
-* **Flutter**
-* **經濟學模型模擬**
+程式碼不只是實現功能的工具，更是一種表達邏輯的藝術。在這個資訊爆炸的時代，我致力於提供如礦泉水般透明、純粹且易於吸收的技術見解。
 
-## 我的技術堆疊
+## 技術雷達
 
-### Backend
-我主要使用 Python 生態系。對於快速開發 API，我首選 **FastAPI**；如果是大型專案，我會使用 **Django**。
+我目前的技術選型以實用主義為核心，確保每一項工具都能在效能與開發效率之間取得最佳平衡。
 
-\`\`\`python
-def hello_world():
-    print("Hello from Yueswater!")
-\`\`\`
+### 核心採用 (Adopt)
+* **後端開發**: Django / Django REST Framework (DRF)
+* **前端工藝**: Next.js (App Router) / TypeScript / Tailwind CSS
+* **基礎設施**: Cloudinary (雲端媒體儲存) / Docker / PostgreSQL
 
-### Frontend
-目前全面轉向 **Next.js (App Router)**，搭配 TypeScript 與 Tailwind CSS，這能帶給我最好的開發體驗。
+### 評估中 (Trial)
+* **FastAPI**: 用於處理高併發的異步微服務。
+* **React Easy Crop**: 用於前端圖片裁剪與預覽優化。
+* **Motion (Framer Motion)**: 建立更流暢的使用者介面轉場。
 
-## 專案經歷
+### 持續觀測 (Assess)
+* **Rust**: 探索系統底層效能優化的可能性。
+* **HTMX**: 評估在輕量級交互專案中替代複雜前端框架的潛力。
 
-### 1. 岳氏礦泉水部落格
-就是你現在看到的網站！使用 Next.js 14 + Django DRF 建構。
+## 技術執著
 
-### 2. 經濟學模型模擬
-透過 Python 建立供需模型，並試圖解決資訊不對稱的問題。
+### 介面哲學
+我堅持極簡主義的視覺風格。在我的專案中，你會發現大量的純色塊與邊框運用，我傾向於移除所有不必要的陰影 (Shadow-none)，利用色差與線條來建立層次感。
 
-## 聯絡我
-如果你有任何合作機會，歡迎透過 [Email](mailto:test@example.com) 聯繫我。
+### 跨領域邏輯
+我熱衷於將經濟學模型轉化為演算法模擬。我認為軟體開發中的狀態管理與經濟體系的運作原理有著高度的相似性。
+
+### 安全與架構
+從 JWT 認證流程到 SMTP 郵件驗證系統，我對系統安全性與使用者流程的嚴謹度有著近乎苛求的堅持。
+
+
+## 聯絡方式
+
+如果你有技術合作、專案開發需求，或者單純想討論技術架構，歡迎透過以下方式與我聯繫：
+
+* **官方網站**: [yueswater.com](https://www.yueswater.com)
+* **電子郵件**: [sungpunyue@gmail.com](mailto:sungpunyue@gmail.com)
 `;
 
 export default function AboutPage() {
@@ -44,7 +53,7 @@ export default function AboutPage() {
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
         <main className="lg:col-span-8">
           <div className="mb-8 border-b border-[color:var(--border)] pb-8">
-            <h1 className="text-foreground mb-4 text-4xl font-bold">關於我</h1>
+            <h1 className="text-foreground mb-4 text-4xl font-bold">關於岳氏礦泉水</h1>
             <div className="text-foreground/60 flex items-center gap-4">
               <span>最後更新：2026-01-12</span>
               <span>•</span>
