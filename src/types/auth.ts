@@ -7,4 +7,5 @@ export interface LoginResponse {
   avatar: string | null;
   first_name?: string; 
   last_name?: string;
+  is_active?: boolean;
 }

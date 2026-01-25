@@ -1,89 +1,76 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { User } from "@/types";
 import { authService } from "@/services/authService";
 
-export function ProfileForm() {
-  const { user, login } = useAuth();
+export function ProfileForm({ user }: { user: User | null }) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: user?.username || "",
     first_name: user?.first_name || "",
     last_name: user?.last_name || "",
-    email: user?.email || "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const updatedUser = await authService.updateProfile({
-        username: formData.username,
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-      });
+      const updatedUser = await authService.updateProfile(formData);
       localStorage.setItem("user", JSON.stringify(updatedUser));
       window.location.reload();
     } catch (err: any) {
-      alert(err.message);
+      alert("更新失敗：" + err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  const inputStyle = "w-full rounded-2xl border-2 border-base-200 bg-base-100 px-6 py-4 outline-none transition-all focus:border-primary focus:bg-card font-medium";
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="form-control">
-          <label className="label text-sm font-bold">姓氏</label>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <div className="space-y-3">
+          <label className="text-sm font-black text-foreground/60 ml-2">姓氏</label>
           <input
             type="text"
-            className="input input-bordered rounded-xl bg-base-200/50"
+            className={inputStyle}
             value={formData.last_name}
             onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-            placeholder="請輸入姓氏"
+            placeholder="尚未填寫"
           />
         </div>
-        <div className="form-control">
-          <label className="label text-sm font-bold">名字</label>
+        <div className="space-y-3">
+          <label className="text-sm font-black text-foreground/60 ml-2">名字</label>
           <input
             type="text"
-            className="input input-bordered rounded-xl bg-base-200/50"
+            className={inputStyle}
             value={formData.first_name}
             onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-            placeholder="請輸入名字"
+            placeholder="尚未填寫"
           />
         </div>
       </div>
 
-      <div className="form-control">
-        <label className="label text-sm font-bold">使用者名稱</label>
+      <div className="space-y-3">
+        <label className="text-sm font-black text-foreground/60 ml-2">使用者名稱</label>
         <input
           type="text"
-          className="input input-bordered rounded-xl bg-base-200/50"
+          className={`${inputStyle} cursor-not-allowed opacity-50`}
           value={formData.username}
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-        />
-      </div>
-
-      <div className="form-control">
-        <label className="label text-sm font-bold">電子郵件</label>
-        <input
-          type="email"
-          className="input input-bordered rounded-xl opacity-60"
-          value={formData.email}
           disabled
         />
+        <p className="text-[10px] text-foreground/30 ml-2">目前使用者名稱無法修改</p>
       </div>
 
-      <div className="flex justify-end pt-4">
-        <button
-          type="submit"
-          className={`btn btn-primary rounded-xl px-8 ${loading ? "loading" : ""}`}
+      <div className="flex justify-end pt-8">
+        <button 
+          type="submit" 
+          className="btn btn-primary h-auto min-h-0 rounded-[1.25rem] px-14 py-4 text-base font-black shadow-lg shadow-primary/30 transition-all hover:scale-[1.03] active:scale-[0.97]"
           disabled={loading}
         >
-          儲存設定
+          {loading ? "處理中..." : "儲存並更新資料"}
         </button>
       </div>
     </form>

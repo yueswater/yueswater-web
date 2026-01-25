@@ -7,6 +7,7 @@ export interface User {
   first_name?: string;
   last_name?: string;
   bio?: string;
+  is_active?: boolean;
 }
 
 // 分類
