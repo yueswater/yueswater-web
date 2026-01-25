@@ -5,23 +5,31 @@ import { Camera, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { authService } from "@/services/authService";
+import { ImageCropper } from "./ImageCropper";
 
 export function AvatarUpload() {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
+  const [tempImage, setTempImage] = useState<string | null>(null);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("圖片大小不能超過 2MB");
-      return;
-    }
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setTempImage(reader.result as string);
+    });
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
 
+  const handleUpload = async (croppedBlob: Blob) => {
+    setTempImage(null);
     setUploading(true);
+
     const formData = new FormData();
-    formData.append("avatar", file);
+    formData.append("avatar", croppedBlob, "avatar.jpg");
 
     try {
       const updatedUser = await authService.updateAvatar(formData);
@@ -36,7 +44,7 @@ export function AvatarUpload() {
 
   return (
     <div className="relative mx-auto mb-6 h-36 w-36">
-      <div className="h-full w-full overflow-hidden rounded-full">
+      <div className="h-full w-full overflow-hidden rounded-full ring-8 ring-base-100">
         {user?.avatar ? (
           <Image src={user.avatar} alt="頭像" fill className="object-cover" />
         ) : (
@@ -45,7 +53,8 @@ export function AvatarUpload() {
           </div>
         )}
       </div>
-      <label className="btn btn-primary btn-circle btn-sm absolute bottom-1 right-1 cursor-pointer border-none">
+
+      <label className="btn btn-primary btn-circle btn-sm absolute bottom-1 right-1 cursor-pointer border-none shadow-none">
         {uploading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
@@ -59,6 +68,14 @@ export function AvatarUpload() {
           disabled={uploading}
         />
       </label>
+
+      {tempImage && (
+        <ImageCropper
+          image={tempImage}
+          onCropComplete={handleUpload}
+          onCancel={() => setTempImage(null)}
+        />
+      )}
     </div>
   );
 }
