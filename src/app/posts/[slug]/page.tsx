@@ -7,31 +7,31 @@ import { LikeSection } from "@/components/features/posts/LikeSection";
 import { CommentSection } from "@/components/features/posts/CommentSection";
 import { getFullImageUrl, processContentImages } from "@/utils/urlHelpers";
 
-const API_URL = process.env.SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL;
+const API_URL = (process.env.SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/$/, "");
 
 async function getPost(slug: string): Promise<Post | null> {
   try {
-    const response = await fetch(`${API_URL}/posts/${slug}/`, {
+    const url = `${API_URL}/posts/${slug}/`;
+    const response = await fetch(url, {
       cache: "no-store",
     });
 
     if (!response.ok) return null;
     return response.json();
   } catch (error) {
-    console.error("Fetch failed", error);
     return null;
   }
 }
 
 async function recordView(slug: string): Promise<boolean> {
   try {
-    const response = await fetch(`${API_URL}/posts/${slug}/view/`, {
+    const url = `${API_URL}/posts/${slug}/view/`;
+    const response = await fetch(url, {
       method: "POST",
     });
 
     return response.ok;
   } catch (error) {
-    console.error("View record failed", error);
     return false;
   }
 }
@@ -53,8 +53,6 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
       </div>
     );
   }
-
-  console.log("FINAL URL:", getFullImageUrl(post.cover_image))
 
   return (
     <main className="container mx-auto px-4 py-8">
