@@ -80,7 +80,7 @@ export function UserProfileSidebar({ isOpen, onClose }: UserProfileSidebarProps)
               <nav className="flex flex-1 flex-col items-end space-y-2">
                 {[
                   { label: "個人檔案", href: "/profile", delay: 0.3 },
-                  { label: "我的收藏", href: "/favorites", delay: 0.35 },
+                  { label: "收藏文章", href: "/favorites", delay: 0.35 },
                 ].map((item) => (
                   <motion.div
                     key={item.href}

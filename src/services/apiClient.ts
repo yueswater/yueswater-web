@@ -5,36 +5,100 @@ interface FetchOptions extends RequestInit {
   skipAuth?: boolean;
 }
 
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
+function onRefreshed(token: string) {
+  refreshSubscribers.map((cb) => cb(token));
+}
+
 export async function apiClient<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
   const { skipAuth = false, ...fetchOptions } = options;
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
+  
   let cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
   if (!cleanEndpoint.includes("?") && !cleanEndpoint.endsWith("/")) {
     cleanEndpoint = `${cleanEndpoint}/`;
   }
 
-  const headers: Record<string, string> = {
-    ...fetchOptions.headers,
+  const getHeaders = (token: string | null) => {
+    const h = new Headers(fetchOptions.headers);
+    if (fetchOptions.body && !(fetchOptions.body instanceof FormData)) {
+      h.set("Content-Type", "application/json");
+    }
+    if (!skipAuth && token) {
+      h.set("Authorization", `Bearer ${token}`);
+    }
+    return h;
   };
 
-  if (!(fetchOptions.body instanceof FormData)) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  if (!skipAuth && token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
+  const currentToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const response = await fetch(`${BASE_URL}${cleanEndpoint}`, {
     ...fetchOptions,
-    headers,
+    headers: getHeaders(currentToken),
   });
+
+  if (response.status === 401 && !skipAuth) {
+    const refreshToken = typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null;
+
+    if (!refreshToken) {
+      if (typeof window !== "undefined") {
+        localStorage.clear();
+        window.location.href = "/login";
+      }
+      throw new Error("Session expired");
+    }
+
+    if (isRefreshing) {
+      return new Promise((resolve) => {
+        subscribeTokenRefresh((newToken) => {
+          resolve(
+            fetch(`${BASE_URL}${cleanEndpoint}`, {
+              ...fetchOptions,
+              headers: getHeaders(newToken),
+            }).then((res) => res.json())
+          );
+        });
+      });
+    }
+
+    isRefreshing = true;
+
+    try {
+      const refreshResponse = await fetch(`${BASE_URL}/auth/refresh/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh: refreshToken }),
+      });
+
+      if (refreshResponse.ok) {
+        const { access } = await refreshResponse.json();
+        localStorage.setItem("token", access);
+        onRefreshed(access);
+        
+        const retryResponse = await fetch(`${BASE_URL}${cleanEndpoint}`, {
+          ...fetchOptions,
+          headers: getHeaders(access),
+        });
+        return retryResponse.json();
+      } else {
+        localStorage.clear();
+        window.location.href = "/login";
+        throw new Error("Refresh token invalid");
+      }
+    } finally {
+      isRefreshing = false;
+      refreshSubscribers = [];
+    }
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const errorMsg = errorData.detail || errorData.message || "API 請求失敗";
-    throw new Error(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
+    const errorMsg = errorData.detail || errorData.message || "Request failed";
+    throw new Error(typeof errorMsg === "string" ? errorMsg : JSON.stringify(errorMsg));
   }
 
   return response.json();

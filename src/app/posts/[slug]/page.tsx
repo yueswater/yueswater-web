@@ -4,18 +4,17 @@ import { ArticleBody } from "@/components/features/posts/ArticleBody";
 import { TableOfContents } from "@/components/features/posts/TableOfContents";
 import { ClientArticleHeader } from "@/components/features/posts/ClientArticleHeader";
 import { LikeSection } from "@/components/features/posts/LikeSection";
+import { BookmarkSection } from "@/components/features/posts/BookmarkSection";
+import { ShareSection } from "@/components/features/posts/ShareSection";
 import { CommentSection } from "@/components/features/posts/CommentSection";
 import { getFullImageUrl, processContentImages } from "@/utils/urlHelpers";
 
-const API_URL = (process.env.SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/$/, "");
+const API_URL = (process.env.SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8088/api").replace(/\/$/, "");
 
 async function getPost(slug: string): Promise<Post | null> {
   try {
     const url = `${API_URL}/posts/${slug}/`;
-    const response = await fetch(url, {
-      cache: "no-store",
-    });
-
+    const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) return null;
     return response.json();
   } catch (error) {
@@ -26,10 +25,7 @@ async function getPost(slug: string): Promise<Post | null> {
 async function recordView(slug: string): Promise<boolean> {
   try {
     const url = `${API_URL}/posts/${slug}/view/`;
-    const response = await fetch(url, {
-      method: "POST",
-    });
-
+    const response = await fetch(url, { method: "POST" });
     return response.ok;
   } catch (error) {
     return false;
@@ -42,14 +38,13 @@ interface PostDetailPageProps {
 
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
   const { slug } = await params;
-
-  const [post, viewRecorded] = await Promise.all([getPost(slug), recordView(slug)]);
+  const [post] = await Promise.all([getPost(slug), recordView(slug)]);
 
   if (!post) {
     return (
       <div className="flex h-[80vh] flex-col items-center justify-center gap-4">
         <h1 className="text-3xl font-bold">404</h1>
-        <p className="opacity-60">Post Not Found</p>
+        <p className="opacity-60">文章不存在</p>
       </div>
     );
   }
@@ -78,11 +73,25 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
             <ArticleBody content={processContentImages(post.content)} />
           </div>
 
-          <LikeSection
-            postId={post.id}
-            initialLikes={post.likes_count || 0}
-            isLiked={post.is_liked || false}
-          />
+          <div className="mb-10 mt-12 border-y border-base-200 py-16">
+            <div className="flex flex-col items-center justify-center gap-12 md:flex-row md:gap-0">
+              <div className="flex justify-center md:flex-1">
+                <LikeSection
+                  postId={post.id}
+                  initialLikes={post.likes_count || 0}
+                  isLiked={post.is_liked || false}
+                />
+              </div>
+
+              <div className="flex justify-center md:flex-1">
+                <ShareSection />
+              </div>
+
+              <div className="flex justify-center md:flex-1">
+                <BookmarkSection postId={post.id} />
+              </div>
+            </div>
+          </div>
 
           <CommentSection postId={post.id} slug={post.slug} initialComments={post.comments || []} />
         </article>

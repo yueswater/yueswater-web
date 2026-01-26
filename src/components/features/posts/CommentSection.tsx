@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Send, User as LucideUser, Pencil, Trash2, X, Check } from "lucide-react";
+import Image from "next/image";
+import { Send, Pencil, Trash2, X, Check } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Comment as PostComment } from "@/types";
 import { postService } from "@/services/postService";
@@ -17,8 +18,6 @@ export function CommentSection({ postId, slug, initialComments = [] }: CommentSe
   const [comments, setComments] = useState<PostComment[]>(initialComments);
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // 編輯狀態管理
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState("");
 
@@ -67,30 +66,39 @@ export function CommentSection({ postId, slug, initialComments = [] }: CommentSe
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl border-t border-[color:var(--border)] pt-8">
-      <h3 className="text-base-content mb-8 text-xl font-bold">留言 ({comments.length})</h3>
+    <div className="mx-auto w-full max-w-3xl border-t border-base-200 pt-8">
+      <h3 className="mb-8 text-xl font-bold">留言 ({comments.length})</h3>
 
-      {/* 留言輸入框 */}
       <div className="mb-10">
         {user ? (
           <form onSubmit={handleSubmit} className="flex gap-4">
-            <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
-              <span className="text-primary text-lg font-bold">
-                {user.username?.[0]?.toUpperCase()}
-              </span>
+            <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full ring-1 ring-base-200">
+              {user.avatar ? (
+                <Image
+                  src={user.avatar}
+                  alt={user.username}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="bg-primary/10 text-primary flex h-full w-full items-center justify-center text-lg font-black">
+                  {user.username?.[0]?.toUpperCase()}
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="寫下你的想法..."
-                className="bg-base-200/50 focus:ring-primary/20 focus:border-primary text-base-content placeholder:text-base-content/40 min-h-[100px] w-full resize-y rounded-xl border border-[color:var(--border)] p-4 transition-all focus:ring-2 focus:outline-none"
+                className="bg-base-200/50 focus:ring-primary/20 focus:border-primary placeholder:text-base-content/40 min-h-[100px] w-full resize-y rounded-xl border border-base-200 p-4 transition-all focus:ring-2 focus:outline-none"
               />
               <div className="mt-3 flex justify-end">
                 <button
                   type="submit"
                   disabled={isSubmitting || !content.trim()}
-                  className="bg-primary text-primary-content flex items-center gap-2 rounded-lg px-6 py-2 font-medium transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="bg-primary text-primary-content flex items-center gap-2 rounded-lg px-6 py-2 font-black transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 shadow-none border-none"
                 >
                   {isSubmitting ? "傳送中..." : <><Send className="h-4 w-4" /> 發送留言</>}
                 </button>
@@ -98,42 +106,50 @@ export function CommentSection({ postId, slug, initialComments = [] }: CommentSe
             </div>
           </form>
         ) : (
-          <div className="bg-base-200/30 rounded-xl border border-dashed border-[color:var(--border)] p-6 text-center">
+          <div className="bg-base-200/30 rounded-xl border border-dashed border-base-200 p-6 text-center">
             <p className="text-base-content/60 mb-2">登入後即可參與討論</p>
-            <a href={`/login?redirect=/posts/${slug}`} className="text-primary font-medium hover:underline">前往登入</a>
+            <a href={`/login?redirect=/posts/${slug}`} className="text-primary font-bold hover:underline">前往登入</a>
           </div>
         )}
       </div>
 
-      {/* 留言列表 */}
-      <div className="space-y-6">
+      <div className="space-y-8">
         {comments.length > 0 ? (
           comments.map((comment) => (
             <div key={comment.id} className="group flex gap-4">
-              <div className="bg-base-200 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[color:var(--border)]">
-                <LucideUser className="text-base-content/50 h-5 w-5" />
+              <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full ring-1 ring-base-200">
+                {comment.user.avatar ? (
+                  <Image
+                    src={comment.user.avatar}
+                    alt={comment.user.username}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="bg-base-200 text-base-content/40 flex h-full w-full items-center justify-center text-lg font-black">
+                    {comment.user.username?.[0]?.toUpperCase()}
+                  </div>
+                )}
               </div>
               <div className="flex-1">
                 <div className="mb-1 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-base-content font-semibold">{comment.user.username}</span>
+                    <span className="font-bold">{comment.user.username}</span>
                     <span className="text-base-content/40 text-xs">{new Date(comment.created_at).toLocaleDateString()}</span>
                   </div>
                   
-                  {/* 操作按鈕：僅本人可見 */}
                   {user?.id === comment.user.id && (
                     <div className="flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
                       <button 
                         onClick={() => startEditing(comment)}
                         className="text-base-content/40 hover:text-primary p-1 transition-colors"
-                        title="編輯留言"
                       >
                         <Pencil className="h-4 w-4" />
                       </button>
                       <button 
                         onClick={() => handleDelete(comment.id)}
                         className="text-base-content/40 hover:text-error p-1 transition-colors"
-                        title="刪除留言"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -142,24 +158,24 @@ export function CommentSection({ postId, slug, initialComments = [] }: CommentSe
                 </div>
 
                 {editingId === comment.id ? (
-                  <div className="mt-2">
+                  <div className="mt-2 flex flex-col gap-3">
                     <textarea
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
-                      className="bg-base-200 focus:ring-primary/20 focus:border-primary w-full rounded-lg border border-[color:var(--border)] p-3 focus:ring-2 focus:outline-none"
+                      className="bg-base-200 focus:ring-primary/20 focus:border-primary w-full rounded-xl border border-base-200 p-3 focus:ring-2 focus:outline-none min-h-[80px]"
                     />
-                    <div className="mt-2 flex justify-end gap-2">
+                    <div className="flex justify-end items-center gap-3">
                       <button 
                         onClick={() => setEditingId(null)}
-                        className="btn btn-ghost btn-sm"
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-base-content/60 font-bold hover:bg-base-200 transition-colors text-sm"
                       >
-                        <X className="h-4 w-4" /> 取消
+                        <X className="h-3.5 w-3.5" /> 取消
                       </button>
                       <button 
                         onClick={() => handleUpdate(comment.id)}
-                        className="btn btn-primary btn-sm"
+                        className="flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary text-primary-content font-black hover:opacity-90 transition-opacity text-sm shadow-none border-none"
                       >
-                        <Check className="h-4 w-4" /> 儲存
+                        <Check className="h-3.5 w-3.5" /> 儲存修改
                       </button>
                     </div>
                   </div>

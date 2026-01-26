@@ -33,6 +33,7 @@ export const authService = {
     return apiClient<{ access: string }>("/auth/refresh/", {
       method: "POST",
       body: JSON.stringify({ refresh }),
+      skipAuth: true,
     });
   },
 
