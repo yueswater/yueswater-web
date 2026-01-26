@@ -2,12 +2,13 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { Droplet ,Loader2, ArrowRight, Eye, EyeOff, Droplets } from "lucide-react";
+import { Loader2, ArrowRight, Eye, EyeOff, Droplets } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -51,8 +52,23 @@ export default function LoginPage() {
 
     try {
       await login(formData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "登入失敗");
+      showToast("歡迎回來！", "success");
+    } catch (err: any) {
+      const rawMsg = err.response?.data?.detail || err.message || "";
+      let msg = "登入失敗，請稍後再試";
+      
+      if (rawMsg.includes("No active account found")) {
+        msg = "使用者名稱或密碼錯誤";
+      } else if (rawMsg.includes("User is inactive")) {
+        msg = "此帳號尚未啟用";
+      } else if (rawMsg.includes("Network Error")) {
+        msg = "連線失敗，請檢查網路狀態";
+      } else if (typeof rawMsg === 'string' && rawMsg !== "") {
+        msg = rawMsg;
+      }
+
+      setError(msg);
+      showToast(msg, "error");
     } finally {
       setLoading(false);
     }
@@ -62,14 +78,13 @@ export default function LoginPage() {
     <div className="flex min-h-[calc(100vh-4rem)] items-start justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-          <div className="bg-transparent text-base-100 mx-auto w-fit rounded-2xl p-3">
+          <div className="bg-transparent text-primary mx-auto w-fit rounded-2xl p-3">
             <Droplets className="h-10 w-10" />
           </div>
           <h1 className="text-foreground text-3xl font-bold tracking-tight">歡迎回來</h1>
           <p className="text-foreground/60 mt-2 text-sm">請輸入您的帳號密碼以繼續</p>
         </div>
 
-        {/* 建議：外層卡片也可以加上 border */}
         <div className="bg-card rounded-2xl border border-[color:var(--border)] p-8 shadow-sm">
           <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-6">
             {error && (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { Camera, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -9,6 +10,7 @@ import { ImageCropper } from "./ImageCropper";
 
 export function AvatarUpload() {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [tempImage, setTempImage] = useState<string | null>(null);
 
@@ -34,9 +36,12 @@ export function AvatarUpload() {
     try {
       const updatedUser = await authService.updateAvatar(formData);
       localStorage.setItem("user", JSON.stringify(updatedUser));
-      window.location.reload();
+      showToast("頭像更新成功", "success");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (err: any) {
-      alert("上傳失敗：" + err.message);
+      showToast("上傳失敗：" + err.message, "error");
     } finally {
       setUploading(false);
     }

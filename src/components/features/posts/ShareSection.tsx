@@ -3,18 +3,26 @@
 import { useState } from "react";
 import { Share2, Link as LinkIcon, MessageCircle, Facebook } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/context/ToastContext";
 
-export function ShareSection() {
+interface ShareSectionProps {
+  title: string;
+}
+
+export function ShareSection({ title }: ShareSectionProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { showToast } = useToast();
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const customMsg = "嘿！看看我在岳世界找到的好文章，一起來看看吧！";
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareUrl);
-    alert("連結已複製到剪貼簿");
+    navigator.clipboard.writeText(`${customMsg} ${shareUrl}`);
+    showToast("連結與推薦語已複製到剪貼簿", "success");
   };
 
   const shareToLine = () => {
-    window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}`, "_blank");
+    const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(customMsg + "\n" + title)}`;
+    window.open(lineUrl, "_blank");
   };
 
   const shareToFacebook = () => {

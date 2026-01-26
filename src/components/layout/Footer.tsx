@@ -4,8 +4,10 @@ import { Github, Instagram, Facebook, Mail } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { NewsletterModal } from "@/components/shared/NewsletterModal";
 import { newsletterService } from "@/services/newsletterService";
+import { useToast } from "@/context/ToastContext";
 
 export function Footer() {
+  const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -18,11 +20,11 @@ export function Footer() {
   const handleFinalSubscribe = async (nickname: string) => {
     try {
       await newsletterService.subscribe(email, nickname);
-      alert("訂閱成功！請至信箱收取歡迎信。");
+      showToast("訂閱成功！請至信箱收取歡迎信", "success");
       setIsModalOpen(false);
       setEmail("");
     } catch (error: any) {
-      alert(error.message || "訂閱失敗，請稍後再試。");
+      showToast(error.message || "訂閱失敗，請稍後再試", "error");
       throw error;
     }
   };
@@ -40,30 +42,6 @@ export function Footer() {
             </div>
 
             <div className="order-1 flex w-full flex-col items-center gap-4 md:order-2 md:w-auto md:flex-row md:gap-6">
-              {/* <form onSubmit={handleInitialSubmit} className="relative w-full md:w-72">
-                <Mail className="text-muted-foreground/70 pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="訂閱電子報..."
-                  className="bg-muted/50 border-border focus:ring-primary/50 placeholder:text-muted-foreground/70 w-full rounded-full border py-2 pr-10 pl-10 text-sm transition-all focus:ring-1 focus:outline-none"
-                  required
-                />
-
-                <button
-                  type="submit"
-                  className="bg-primary text-primary-foreground absolute top-1 right-1 bottom-1 flex aspect-square items-center justify-center rounded-full transition-opacity hover:opacity-90"
-                  aria-label="訂閱"
-                >
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </button>
-              </form>
-
-              <div className="bg-border hidden h-6 w-px md:block" />
-              */}
-
               <div className="flex items-center gap-2">
                 <a
                   href="mailto:sungpunyue@gmail.com"
@@ -104,14 +82,6 @@ export function Footer() {
           </div>
         </div>
       </footer>
-
-      {/* <NewsletterModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleFinalSubscribe}
-        email={email}
-      />
-      */}
     </>
   );
 }

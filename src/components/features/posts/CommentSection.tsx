@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Send, Pencil, Trash2, X, Check } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { Comment as PostComment } from "@/types";
 import { postService } from "@/services/postService";
 
@@ -15,6 +16,7 @@ interface CommentSectionProps {
 
 export function CommentSection({ postId, slug, initialComments = [] }: CommentSectionProps) {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [comments, setComments] = useState<PostComment[]>(initialComments);
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,8 +32,9 @@ export function CommentSection({ postId, slug, initialComments = [] }: CommentSe
       const newComment = await postService.createComment(postId, content);
       setComments((prev) => [newComment, ...prev]);
       setContent("");
+      showToast("留言發送成功", "success");
     } catch (error: any) {
-      alert(error.message || "留言發送失敗");
+      showToast(error.message || "留言發送失敗", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -42,8 +45,9 @@ export function CommentSection({ postId, slug, initialComments = [] }: CommentSe
     try {
       await postService.deleteComment(commentId);
       setComments((prev) => prev.filter((c) => c.id !== commentId));
+      showToast("留言已刪除", "success");
     } catch (error: any) {
-      alert(error.message);
+      showToast(error.message || "刪除失敗", "error");
     }
   };
 
@@ -55,8 +59,9 @@ export function CommentSection({ postId, slug, initialComments = [] }: CommentSe
         prev.map((c) => (c.id === commentId ? updatedComment : c))
       );
       setEditingId(null);
+      showToast("留言更新成功", "success");
     } catch (error: any) {
-      alert(error.message);
+      showToast(error.message || "更新失敗", "error");
     }
   };
 

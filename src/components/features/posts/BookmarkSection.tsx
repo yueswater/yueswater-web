@@ -5,6 +5,7 @@ import { Bookmark } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { postService } from "@/services/postService";
+import { useToast } from "@/context/ToastContext";
 
 interface BookmarkSectionProps {
   postId: number;
@@ -12,6 +13,7 @@ interface BookmarkSectionProps {
 
 export function BookmarkSection({ postId }: BookmarkSectionProps) {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,15 +41,16 @@ export function BookmarkSection({ postId }: BookmarkSectionProps) {
     try {
       const data = await postService.toggleBookmark(postId);
       setIsBookmarked(data.bookmarked);
+      showToast(data.bookmarked ? "已加入我的收藏" : "已從收藏移除", "success");
     } catch (error) {
-      alert("收藏操作失敗");
+      showToast("操作失敗，請稍後再試", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="mx-auto mt-12 mb-8 flex w-full max-w-3xl flex-col items-center">
+    <div className="mx-auto flex w-full max-w-3xl flex-col items-center">
       <div className="relative">
         <motion.button
           whileTap={{ scale: 0.9 }}
@@ -56,7 +59,7 @@ export function BookmarkSection({ postId }: BookmarkSectionProps) {
           className={`group relative flex h-16 w-16 items-center justify-center rounded-full border-2 transition-all duration-300 ${
             isBookmarked
               ? "border-blue-500 bg-blue-50 text-blue-500"
-              : "text-base-content/50 border-[color:var(--border)] hover:border-blue-400 hover:text-blue-400"
+              : "text-base-content/50 border-base-content/10 hover:border-blue-400 hover:text-blue-400"
           } `}
         >
           <Bookmark
@@ -65,7 +68,9 @@ export function BookmarkSection({ postId }: BookmarkSectionProps) {
           />
         </motion.button>
       </div>
-      <span className="text-base-content/60 mt-3 text-sm font-medium">{isBookmarked ? "已收藏" : "收藏文章"}</span>
+      <span className="mt-2 text-xs font-black uppercase tracking-widest text-base-content/30">
+        {isBookmarked ? "BOOKMARKED" : "BOOKMARK"}
+      </span>
     </div>
   );
 }

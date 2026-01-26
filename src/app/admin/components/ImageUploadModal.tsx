@@ -3,21 +3,21 @@
 import { useState, useRef } from "react";
 import { X, Upload, Image as ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useToast } from "@/context/ToastContext";
 
-// 圖片上傳模態框組件屬性
 interface ImageUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (file: File, altText: string) => Promise<void>; // 上傳 callback
+  onUpload: (file: File, altText: string) => Promise<void>;
 }
 
-// 圖片上傳模態框組件
 export function ImageUploadModal({ isOpen, onClose, onUpload }: ImageUploadModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [altText, setAltText] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { showToast } = useToast();
 
   if (!isOpen) return null;
 
@@ -26,7 +26,6 @@ export function ImageUploadModal({ isOpen, onClose, onUpload }: ImageUploadModal
     if (selectedFile) {
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
-      // 預設 alt text 為檔名
       setAltText(selectedFile.name.split(".").slice(0, -1).join("."));
     }
   };
@@ -36,14 +35,13 @@ export function ImageUploadModal({ isOpen, onClose, onUpload }: ImageUploadModal
     setIsUploading(true);
     try {
       await onUpload(file, altText);
-      // 上傳成功後清空狀態並關閉
+      showToast("圖片上傳成功", "success");
       setFile(null);
       setPreview(null);
       setAltText("");
       onClose();
     } catch (error) {
-      console.error("Upload failed", error);
-      alert("上傳失敗，請重試");
+      showToast("上傳失敗，請重試", "error");
     } finally {
       setIsUploading(false);
     }

@@ -41,13 +41,17 @@ export async function apiClient<T>(endpoint: string, options: FetchOptions = {})
     headers: getHeaders(currentToken),
   });
 
-  if (response.status === 401 && !skipAuth) {
+  const isLoginRequest = cleanEndpoint.includes("/login/");
+
+  if (response.status === 401 && !skipAuth && !isLoginRequest) {
     const refreshToken = typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null;
 
     if (!refreshToken) {
       if (typeof window !== "undefined") {
         localStorage.clear();
-        window.location.href = "/login";
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
       }
       throw new Error("Session expired");
     }
@@ -86,7 +90,9 @@ export async function apiClient<T>(endpoint: string, options: FetchOptions = {})
         return retryResponse.json();
       } else {
         localStorage.clear();
-        window.location.href = "/login";
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
         throw new Error("Refresh token invalid");
       }
     } finally {

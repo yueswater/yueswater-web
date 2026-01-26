@@ -36,6 +36,27 @@ interface PostDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
+export async function generateMetadata({ params }: PostDetailPageProps) {
+  const { slug } = await params;
+  const post = await getPost(slug);
+
+  if (!post) return { title: "文章不存在" };
+
+  const shareDescription = "嘿！看看我在岳世界找到的好文章，一起來看看吧！";
+
+  return {
+    title: post.title,
+    description: shareDescription,
+    openGraph: {
+      title: post.title,
+      description: shareDescription,
+      url: `https://yueswater.com/posts/${slug}`,
+      images: [getFullImageUrl(post.cover_image)],
+      type: "article",
+    },
+  };
+}
+
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
   const { slug } = await params;
   const [post] = await Promise.all([getPost(slug), recordView(slug)]);
@@ -84,7 +105,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
               </div>
 
               <div className="flex justify-center md:flex-1">
-                <ShareSection />
+                <ShareSection title={post.title} />
               </div>
 
               <div className="flex justify-center md:flex-1">

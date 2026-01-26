@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { User } from "@/types";
 import { authService } from "@/services/authService";
+import { useToast } from "@/context/ToastContext";
 
 export function ProfileForm({ user }: { user: User | null }) {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: user?.username || "",
@@ -18,9 +20,12 @@ export function ProfileForm({ user }: { user: User | null }) {
     try {
       const updatedUser = await authService.updateProfile(formData);
       localStorage.setItem("user", JSON.stringify(updatedUser));
-      window.location.reload();
+      showToast("個人資料更新成功", "success");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (err: any) {
-      alert("更新失敗：" + err.message);
+      showToast("更新失敗：" + err.message, "error");
     } finally {
       setLoading(false);
     }

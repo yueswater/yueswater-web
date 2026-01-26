@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { authService } from "@/services/authService";
 import { KeyRound, ShieldAlert } from "lucide-react";
+import { useToast } from "@/context/ToastContext";
 
 export function PasswordForm() {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [passwords, setPasswords] = useState({
     old_password: "",
@@ -15,16 +17,16 @@ export function PasswordForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (passwords.new_password !== passwords.confirm_password) {
-      alert("新密碼與確認新密碼不一致");
+      showToast("新密碼與確認新密碼不一致", "error");
       return;
     }
     setLoading(true);
     try {
       await authService.changePassword(passwords);
       setPasswords({ old_password: "", new_password: "", confirm_password: "" });
-      alert("密碼已成功更新");
+      showToast("密碼已成功更新", "success");
     } catch (err: any) {
-      alert(err.message || "密碼更新失敗，請檢查舊密碼是否正確");
+      showToast(err.message || "密碼更新失敗，請檢查舊密碼是否正確", "error");
     } finally {
       setLoading(false);
     }
