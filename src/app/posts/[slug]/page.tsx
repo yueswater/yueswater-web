@@ -95,8 +95,8 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
           </div>
 
           <div className="mb-10 mt-12 border-y border-base-200 py-16">
-            <div className="flex flex-col items-center justify-center gap-12 md:flex-row md:gap-0">
-              <div className="flex justify-center md:flex-1">
+            <div className="flex flex-row items-start justify-center">
+              <div className="w-1/3 flex justify-center">
                 <LikeSection
                   postId={post.id}
                   initialLikes={post.likes_count || 0}
@@ -104,11 +104,11 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                 />
               </div>
 
-              <div className="flex justify-center md:flex-1">
+              <div className="w-1/3 flex justify-center">
                 <ShareSection title={post.title} />
               </div>
 
-              <div className="flex justify-center md:flex-1">
+              <div className="w-1/3 flex justify-center">
                 <BookmarkSection postId={post.id} />
               </div>
             </div>

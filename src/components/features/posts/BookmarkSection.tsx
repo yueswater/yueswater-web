@@ -50,16 +50,16 @@ export function BookmarkSection({ postId }: BookmarkSectionProps) {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col items-center">
-      <div className="relative">
+    <div className="mx-auto flex w-full flex-col items-center">
+      <div className="relative flex h-16 items-center justify-center">
         <motion.button
           whileTap={{ scale: 0.9 }}
           onClick={handleToggle}
           disabled={isLoading}
           className={`group relative flex h-16 w-16 items-center justify-center rounded-full border-2 transition-all duration-300 ${
             isBookmarked
-              ? "border-blue-500 bg-blue-50 text-blue-500"
-              : "text-base-content/50 border-base-content/10 hover:border-blue-400 hover:text-blue-400"
+              ? "border-[#2a7eff] bg-blue-50 text-[#2a7eff]"
+              : "text-base-content/50 border-base-content/10 hover:border-[#4ea0ff] hover:text-[#4ea0ff]"
           } `}
         >
           <Bookmark
@@ -69,7 +69,7 @@ export function BookmarkSection({ postId }: BookmarkSectionProps) {
         </motion.button>
       </div>
       <span className="mt-2 text-xs font-black uppercase tracking-widest text-base-content/30">
-        {isBookmarked ? "BOOKMARKED" : "BOOKMARK"}
+        {isBookmarked ? "已收藏" : "收藏"}
       </span>
     </div>
   );

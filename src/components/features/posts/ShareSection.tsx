@@ -31,11 +31,11 @@ export function ShareSection({ title }: ShareSectionProps) {
 
   return (
     <div 
-      className="flex flex-col items-center justify-center"
+      className="mx-auto flex w-full flex-col items-center"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative flex items-center justify-center h-16 w-64">
+      <div className="relative flex h-16 w-full items-center justify-center">
         <AnimatePresence mode="wait">
           {!isHovered ? (
             <motion.div
@@ -43,9 +43,9 @@ export function ShareSection({ title }: ShareSectionProps) {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              className="flex h-16 w-16 cursor-pointer items-center justify-center rounded-full border-2 border-base-content/20 bg-base-100 text-base-content/50 transition-colors hover:border-primary hover:text-primary"
+              className="flex h-16 w-16 cursor-pointer items-center justify-center rounded-full border-2 border-base-content/10 bg-base-100 text-base-content/50 transition-all hover:border-primary hover:text-primary"
             >
-              <Share2 className="h-7 w-7" />
+              <Share2 className="h-8 w-8" />
             </motion.div>
           ) : (
             <motion.div
@@ -53,7 +53,7 @@ export function ShareSection({ title }: ShareSectionProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="flex items-center gap-6"
+              className="flex items-center gap-4"
             >
               <motion.button
                 whileHover={{ y: -5, scale: 1.1 }}
@@ -85,7 +85,7 @@ export function ShareSection({ title }: ShareSectionProps) {
           )}
         </AnimatePresence>
       </div>
-      <span className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-base-content/30">
+      <span className="mt-2 text-xs font-black uppercase tracking-widest text-base-content/30">
         分享文章
       </span>
     </div>

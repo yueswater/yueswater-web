@@ -12,33 +12,31 @@ export function TagListTable({ tags }: TagListTableProps) {
   const sortedTags = [...tags].sort((a, b) => (b.count || 0) - (a.count || 0));
 
   return (
-    <div className="bg-base-100 relative flex h-full flex-col overflow-hidden rounded-3xl p-4">
-      {/* 標題區 */}
-      <div className="mb-4 px-2">
+    <div className="bg-base-100 flex h-full flex-col overflow-hidden rounded-3xl p-4 border border-base-content/5 shadow-sm">
+      <div className="mb-4 px-2 shrink-0">
         <h3 className="text-base-content/80 text-lg font-bold">熱門標籤</h3>
         <p className="text-base-content/50 text-xs">共 {tags.length} 個標籤</p>
       </div>
 
-      <div className="custom-scrollbar -mr-2 flex-1 overflow-y-auto pr-2">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
         <table className="table w-full border-separate border-spacing-y-1">
-          <thead className="bg-base-100 sticky top-0 z-10">
-            <tr className="text-base-content/50 border-base-200/50 border-b text-xs tracking-wider uppercase">
-              <th className="w-16 py-3 text-center">#</th>
-              <th className="py-3">TAG</th>
-              <th className="py-3 text-right">COUNT</th>
-              <th className="w-12"></th>
+          <thead className="sticky top-0 z-20 bg-base-100">
+            <tr className="text-base-content/50 text-xs tracking-wider uppercase">
+              <th className="w-16 py-3 text-center bg-base-100">#</th>
+              <th className="py-3 bg-base-100">TAG</th>
+              <th className="py-3 text-right bg-base-100">COUNT</th>
+              <th className="w-12 bg-base-100"></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="before:block before:h-2">
             {sortedTags.map((tag, index) => (
               <tr
                 key={tag.id}
-                className="group hover:bg-base-200/50 rounded-xl transition-all duration-200"
+                className="group hover:bg-base-200/50 transition-all duration-200"
               >
                 <td className="text-base-content/40 rounded-l-xl text-center font-mono text-xs">
                   {index + 1}
                 </td>
-
                 <td>
                   <Link
                     href={`/tags/${tag.slug}`}
@@ -48,13 +46,11 @@ export function TagListTable({ tags }: TagListTableProps) {
                     {tag.name}
                   </Link>
                 </td>
-
                 <td className="text-right">
                   <span className="text-base-content/60 bg-base-200 group-hover:bg-primary/10 group-hover:text-primary rounded-md px-2 py-1 font-mono text-xs transition-colors">
                     {tag.count || 0}
                   </span>
                 </td>
-
                 <td className="rounded-r-xl">
                   <Link
                     href={`/tags/${tag.slug}`}
