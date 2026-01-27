@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Noto_Sans_TC } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/features/theme/ThemeProvider";
 import { Navbar } from "@/components/layout/Navbar";
@@ -7,7 +8,34 @@ import { Footer } from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const notoSansTC = Noto_Sans_TC({
+  subsets: ["latin"],
+  weight: ["700", "900"],
+  variable: "--font-noto-sans",
+  display: "swap",
+});
+
+const genJyuuGothic = localFont({
+  src: [
+    {
+      path: "../../public/fonts/GenJyuuGothic-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/GenJyuuGothic-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/GenJyuuGothic-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-gen-jyuu",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "岳氏礦泉水",
@@ -24,9 +52,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-TW" suppressHydrationWarning>
+    <html 
+      lang="zh-TW" 
+      className={`${notoSansTC.variable} ${genJyuuGothic.variable}`}
+      suppressHydrationWarning
+    >
       <body
-        className={`${inter.className} bg-background text-foreground flex min-h-screen flex-col pt-16 antialiased`}
+        className="bg-background text-foreground font-sans flex min-h-screen flex-col pt-16 antialiased"
       >
         <AuthProvider>
           <ThemeProvider>
