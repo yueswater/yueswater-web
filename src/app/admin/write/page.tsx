@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
@@ -37,6 +37,30 @@ export default function WritePage() {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const stateRef = useRef({
+    title,
+    slug,
+    content,
+    excerpt,
+    currentSlug,
+    coverImage,
+    selectedCategories,
+    selectedTags,
+  });
+
+  useEffect(() => {
+    stateRef.current = {
+      title,
+      slug,
+      content,
+      excerpt,
+      currentSlug,
+      coverImage,
+      selectedCategories,
+      selectedTags,
+    };
+  }, [title, slug, content, excerpt, currentSlug, coverImage, selectedCategories, selectedTags]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -108,52 +132,77 @@ export default function WritePage() {
     }, 0);
   };
 
-  const handleSubmit = async (action: "draft" | "publish") => {
-    if (!title || !slug || !content) {
-      showToast("標題、Slug 和內容為必填項", "error");
+  const handleSubmit = useCallback(async (action: "draft" | "publish", silent = false) => {
+    const s = stateRef.current;
+    if (!s.title || !s.slug || !s.content) {
+      if (!silent) showToast("標題、Slug 和內容為必填項", "error");
       return;
     }
-    setIsSubmitting(true);
+    
+    if (!silent) setIsSubmitting(true);
+    
     try {
       const formData = new FormData();
-      formData.append("title", title);
-      formData.append("slug", slug);
-      formData.append("content", content);
-      formData.append("excerpt", excerpt);
+      formData.append("title", s.title);
+      formData.append("slug", s.slug);
+      formData.append("content", s.content);
+      formData.append("excerpt", s.excerpt);
 
       const isDraft = action === "draft";
       formData.append("is_draft", String(isDraft));
       formData.append("is_published", String(!isDraft));
       formData.append("is_archived", "false");
 
-      if (coverImage) {
-        formData.append("cover_image", coverImage);
+      if (s.coverImage) {
+        formData.append("cover_image", s.coverImage);
       }
 
-      if (selectedCategories.length > 0) {
-        formData.append("category_id", selectedCategories[0].id.toString());
+      if (s.selectedCategories.length > 0) {
+        formData.append("category_id", s.selectedCategories[0].id.toString());
       }
 
-      selectedTags.forEach((tag) => {
+      s.selectedTags.forEach((tag) => {
         formData.append("tags_ids", tag.id.toString());
       });
 
       let response;
-      if (currentSlug) {
-        response = await postService.updatePost(currentSlug, formData);
+      if (s.currentSlug) {
+        response = await postService.updatePost(s.currentSlug, formData);
       } else {
         response = await postService.createPost(formData);
         setCurrentSlug(response.slug);
       }
 
-      showToast(isDraft ? "草稿儲存成功" : "文章發布成功", "success");
-      if (!isDraft) router.push("/");
+      if (!silent) {
+        showToast(isDraft ? "草稿儲存成功" : "文章發布成功", "success");
+        if (!isDraft) router.push("/");
+      } else {
+        console.log("Auto-saved at", new Date().toLocaleTimeString());
+      }
     } catch (error) {
-      showToast("操作失敗", "error");
+      if (!silent) showToast("操作失敗", "error");
     } finally {
-      setIsSubmitting(false);
+      if (!silent) setIsSubmitting(false);
     }
-  };
+  }, [showToast, router]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        handleSubmit("draft");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSubmit]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleSubmit("draft", true);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [handleSubmit]);
 
   const handleCreateCategory = async (name: string) => {
     try {
