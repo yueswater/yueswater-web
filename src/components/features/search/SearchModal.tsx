@@ -6,12 +6,11 @@ import { postService } from "@/services/postService";
 import { Post } from "@/types";
 import Fuse from "fuse.js";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion"; // 引入 framer-motion
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // 新增：接收觸發按鈕的 Ref，用來定位動畫起點
   triggerRef?: React.RefObject<HTMLElement | null>;
 }
 
@@ -20,29 +19,23 @@ export function SearchModal({ isOpen, onClose, triggerRef }: SearchModalProps) {
   const [results, setResults] = useState<Post[]>([]);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // 用來儲存動畫的起始位置 (偏移量)
   const [origin, setOrigin] = useState({ x: 0, y: 0 });
 
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // 計算動畫起點：當 Modal 開啟時，抓取按鈕的位置
   useEffect(() => {
     if (isOpen && triggerRef?.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-      // 計算：按鈕中心點 - 視窗中心點 = 需要位移的距離
       const x = rect.left + rect.width / 2 - window.innerWidth / 2;
       const y = rect.top + rect.height / 2 - window.innerHeight / 2;
       setOrigin({ x, y });
     }
   }, [isOpen, triggerRef]);
 
-  // 初始化與資料抓取 (保持不變)
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      // 稍微延遲聚焦，讓動畫先跑一下
       setTimeout(() => inputRef.current?.focus(), 100);
 
       const fetchPosts = async () => {
@@ -69,7 +62,6 @@ export function SearchModal({ isOpen, onClose, triggerRef }: SearchModalProps) {
     };
   }, [isOpen]);
 
-  // 監聽 ESC (保持不變)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -78,7 +70,6 @@ export function SearchModal({ isOpen, onClose, triggerRef }: SearchModalProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  // 模糊搜尋 (保持不變)
   useEffect(() => {
     if (!query.trim() || allPosts.length === 0) {
       setResults([]);
@@ -108,7 +99,6 @@ export function SearchModal({ isOpen, onClose, triggerRef }: SearchModalProps) {
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[15vh]">
-          {/* 背景遮罩：獨立淡入淡出 */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -118,30 +108,25 @@ export function SearchModal({ isOpen, onClose, triggerRef }: SearchModalProps) {
             onClick={onClose}
           />
 
-          {/* 視窗主體：精靈效果 */}
           <motion.div
-            // 初始狀態：縮小、透明、位置在按鈕處
             initial={{
               opacity: 0,
-              scale: 0.1, // 不設為 0 以避免部分瀏覽器運算錯誤
+              scale: 0.1,
               x: origin.x,
               y: origin.y,
             }}
-            // 動畫狀態：放大、顯現、回到正中央 (x:0, y:0)
             animate={{
               opacity: 1,
               scale: 1,
               x: 0,
               y: 0,
             }}
-            // 離開狀態：縮回按鈕位置
             exit={{
               opacity: 0,
               scale: 0.1,
               x: origin.x,
               y: origin.y,
             }}
-            // 物理設定：類似 Mac 的彈性效果
             transition={{
               type: "spring",
               damping: 25,
@@ -150,29 +135,31 @@ export function SearchModal({ isOpen, onClose, triggerRef }: SearchModalProps) {
             className="bg-base-100/80 relative w-full max-w-2xl overflow-hidden rounded-2xl shadow-[0_0_50px_-12px_rgb(0_0_0_/_0.25)] backdrop-blur-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 內容區域保持不變 */}
-            <div className="relative flex items-center gap-4 px-6 py-5">
-              <Search className="text-base-content/40 h-6 w-6 shrink-0" />
+            <div className="relative flex items-center gap-2 px-4 py-5 md:gap-4 md:px-6">
+              <Search className="text-base-content/40 h-5 w-5 shrink-0 md:h-6 md:w-6" />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="搜尋文章..."
-                className="placeholder:text-base-content/30 text-base-content flex-1 bg-transparent text-xl font-medium outline-none"
+                className="placeholder:text-base-content/30 text-base-content min-w-0 flex-1 bg-transparent text-lg font-medium outline-none md:text-xl"
               />
 
-              <div className="bg-base-200/50 border-base-content/5 text-base-content/50 hidden items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium md:flex">
+              <div className="bg-base-200/50 border-base-content/5 text-base-content/50 hidden shrink-0 items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium md:flex">
                 <Command className="h-3 w-3" />
                 <span>ESC</span>
               </div>
 
-              <button onClick={onClose} className="text-base-content/50 p-2 md:hidden">
-                <span className="text-sm">取消</span>
+              <button 
+                onClick={onClose} 
+                className="text-base-content/50 shrink-0 whitespace-nowrap px-2 text-sm font-medium md:hidden"
+              >
+                取消
               </button>
 
               {(query || results.length > 0) && (
-                <div className="bg-base-content/5 absolute right-6 bottom-0 left-6 h-[1px]" />
+                <div className="bg-base-content/5 absolute right-4 bottom-0 left-4 h-[1px] md:right-6 md:left-6" />
               )}
             </div>
 
@@ -188,21 +175,21 @@ export function SearchModal({ isOpen, onClose, triggerRef }: SearchModalProps) {
                   <p className="text-sm opacity-60">試試其他關鍵字？</p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-1 p-3">
+                <div className="flex flex-col gap-1 p-2 md:p-3">
                   {results.map((post) => (
                     <div
                       key={post.id}
                       onClick={() => handleSelect(post.slug)}
-                      className="group hover:bg-base-content/5 dark:hover:bg-base-content/10 flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 transition-all duration-200"
+                      className="group hover:bg-base-content/5 dark:hover:bg-base-content/10 flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 md:gap-4 md:px-4 md:py-3"
                     >
                       <FileText className="text-base-content/40 group-hover:text-primary h-5 w-5 shrink-0 transition-colors" />
                       <div className="min-w-0 flex-1">
-                        <h4 className="text-base-content group-hover:text-primary truncate text-lg leading-tight font-semibold transition-colors">
+                        <h4 className="text-base-content group-hover:text-primary truncate text-base leading-tight font-semibold transition-colors md:text-lg">
                           {post.title}
                         </h4>
-                        <div className="text-base-content/50 mt-1 flex items-center gap-2 text-sm">
-                          <span className="max-w-[200px] truncate">
-                            {post.category?.[0]?.name || "未分類"}
+                        <div className="text-base-content/50 mt-1 flex items-center gap-2 text-xs md:text-sm">
+                          <span className="max-w-[120px] truncate md:max-w-[200px]">
+                            {post.category?.name || "未分類"}
                           </span>
                           <span className="opacity-50">·</span>
                           <span className="truncate opacity-70">
@@ -210,7 +197,7 @@ export function SearchModal({ isOpen, onClose, triggerRef }: SearchModalProps) {
                           </span>
                         </div>
                       </div>
-                      <ChevronRight className="text-base-content/20 group-hover:text-primary h-5 w-5 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
+                      <ChevronRight className="text-base-content/20 group-hover:text-primary h-4 w-4 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100 md:h-5 md:w-5" />
                     </div>
                   ))}
                 </div>

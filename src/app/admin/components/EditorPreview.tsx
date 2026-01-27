@@ -7,9 +7,9 @@ import remarkMath from "remark-math";
 import rehypeSlug from "rehype-slug";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
-
 import { CodeBlock } from "@/components/markdown/CodeBlock";
 
 import "highlight.js/styles/nord.css";
@@ -20,13 +20,10 @@ interface EditorPreviewProps {
 }
 
 export function EditorPreview({ content }: EditorPreviewProps) {
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-    },
-  };
+  const processedContent = content ? content.replace(
+    /(@fig-[\w-]+)/g,
+    (match) => match.replace("@", "#")
+  ) : "";
 
   const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
@@ -38,8 +35,8 @@ export function EditorPreview({ content }: EditorPreviewProps) {
   };
 
   const components = {
-    h2: ({ children }: any) => <motion.h2 variants={itemVariants}>{children}</motion.h2>,
-    h3: ({ children }: any) => <motion.h3 variants={itemVariants}>{children}</motion.h3>,
+    h2: ({ node, ...props }: any) => <motion.h2 variants={itemVariants} {...props} />,
+    h3: ({ node, ...props }: any) => <motion.h3 variants={itemVariants} {...props} />,
     p: ({ children }: any) => <motion.p variants={itemVariants}>{children}</motion.p>,
     ul: ({ children }: any) => <motion.ul variants={itemVariants}>{children}</motion.ul>,
     ol: ({ children }: any) => <motion.ol variants={itemVariants}>{children}</motion.ol>,
@@ -52,11 +49,33 @@ export function EditorPreview({ content }: EditorPreviewProps) {
       </motion.div>
     ),
     table: ({ children }: any) => <motion.table variants={itemVariants}>{children}</motion.table>,
+    img: ({ src, alt, width, height, id, style, ...props }: any) => (
+      <motion.figure
+        id={id}
+        variants={itemVariants}
+        className="my-8 flex w-full flex-col items-center justify-center [counter-increment:image-counter] scroll-mt-24 transition-all duration-500 target:ring-4 target:ring-primary/50 target:rounded-xl p-2"
+      >
+        <img
+          src={src}
+          alt={alt || ""}
+          width={width}
+          height={height}
+          style={{ ...style, border: "none", boxShadow: "none", outline: "none" }}
+          className="h-auto max-w-full"
+          {...props}
+        />
+        {alt && (
+          <figcaption className="text-foreground/40 mt-3 w-full text-center text-sm not-italic before:font-bold before:content-['圖_'counter(image-counter)'：']">
+            {alt}
+          </figcaption>
+        )}
+      </motion.figure>
+    ),
   };
 
   return (
     <article
-      className="prose prose-lg dark:prose-invert w-full max-w-none"
+      className="prose prose-lg dark:prose-invert w-full max-none [counter-reset:image-counter]"
       style={
         {
           "--tw-prose-body": "currentColor",
@@ -81,13 +100,14 @@ export function EditorPreview({ content }: EditorPreviewProps) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[
+          rehypeRaw,
           rehypeSlug,
           rehypeHighlight,
           [rehypeKatex, { output: "html", displayMode: true }],
         ]}
         components={components}
       >
-        {content || "*預覽內容將顯示於此...*"}
+        {processedContent || "*預覽內容將顯示於此...*"}
       </ReactMarkdown>
     </article>
   );

@@ -77,7 +77,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
           <ClientArticleHeader post={post} />
 
           {post.cover_image && (
-            <div className="mb-8 overflow-hidden rounded-lg">
+            <div className="mb-8 overflow-hidden">
               <Image
                 src={getFullImageUrl(post.cover_image)}
                 alt={post.title}

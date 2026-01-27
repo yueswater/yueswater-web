@@ -1,20 +1,23 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { X, Upload, Image as ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "@/context/ToastContext";
+import { scaleImage } from "@/utils/imageHelpers";
 
 interface ImageUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (file: File, altText: string) => Promise<void>;
+  onUpload: (file: File, altText: string, width: number, height: number) => Promise<void>;
 }
 
 export function ImageUploadModal({ isOpen, onClose, onUpload }: ImageUploadModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [altText, setAltText] = useState("");
+  const [scale, setScale] = useState(100);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
@@ -25,7 +28,15 @@ export function ImageUploadModal({ isOpen, onClose, onUpload }: ImageUploadModal
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
-      setPreview(URL.createObjectURL(selectedFile));
+      const url = URL.createObjectURL(selectedFile);
+      setPreview(url);
+      
+      const img = new window.Image();
+      img.src = url;
+      img.onload = () => {
+        setDimensions({ width: img.width, height: img.height });
+      };
+      
       setAltText(selectedFile.name.split(".").slice(0, -1).join("."));
     }
   };
@@ -34,11 +45,18 @@ export function ImageUploadModal({ isOpen, onClose, onUpload }: ImageUploadModal
     if (!file) return;
     setIsUploading(true);
     try {
-      await onUpload(file, altText);
+      const finalFile = scale < 100 ? await scaleImage(file, scale) : file;
+      const ratio = scale / 100;
+      const targetWidth = Math.round(dimensions.width * ratio);
+      const targetHeight = Math.round(dimensions.height * ratio);
+      
+      await onUpload(finalFile, altText, targetWidth, targetHeight);
+      
       showToast("圖片上傳成功", "success");
       setFile(null);
       setPreview(null);
       setAltText("");
+      setScale(100);
       onClose();
     } catch (error) {
       showToast("上傳失敗，請重試", "error");
@@ -101,15 +119,33 @@ export function ImageUploadModal({ isOpen, onClose, onUpload }: ImageUploadModal
           )}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-foreground/70 text-sm font-medium">圖片描述 (Alt Text)</label>
-          <input
-            type="text"
-            value={altText}
-            onChange={(e) => setAltText(e.target.value)}
-            placeholder="輸入圖片描述..."
-            className="bg-background focus:border-primary w-full rounded-lg border border-[color:var(--border)] px-3 py-2 text-sm transition-colors outline-none"
-          />
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <label className="text-foreground/70 font-medium">縮放比例</label>
+              <span className="text-primary font-bold">{scale}%</span>
+            </div>
+            <input
+              type="range"
+              min="10"
+              max="100"
+              step="10"
+              value={scale}
+              onChange={(e) => setScale(parseInt(e.target.value))}
+              className="accent-primary h-2 w-full cursor-pointer appearance-none rounded-lg bg-[color:var(--border)]"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-foreground/70 text-sm font-medium">圖片描述 (Alt Text)</label>
+            <input
+              type="text"
+              value={altText}
+              onChange={(e) => setAltText(e.target.value)}
+              placeholder="輸入圖片描述..."
+              className="bg-background focus:border-primary w-full rounded-lg border border-[color:var(--border)] px-3 py-2 text-sm transition-colors outline-none"
+            />
+          </div>
         </div>
 
         <div className="flex items-center gap-3 pt-2">

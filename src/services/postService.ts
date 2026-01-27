@@ -3,38 +3,24 @@ import { Category, Post, Tag, Comment } from "@/types";
 
 export const postService = {
   createPost: async (formData: FormData) => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/`, {
+    return apiClient<Post>("/posts/", {
       method: "POST",
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
       body: formData,
     });
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(errorData.detail || "發布文章失敗");
-    }
-    return res.json();
   },
 
   updatePost: async (slug: string, formData: FormData) => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${slug}/`, {
+    return apiClient<Post>(`/posts/${slug}/`, {
       method: "PATCH",
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
       body: formData,
     });
-    if (!res.ok) throw new Error("更新文章失敗");
-    return res.json();
   },
 
   viewPost: async (slug: string) => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${slug}/view/`, {
+      await apiClient(`/posts/${slug}/view/`, {
         method: "POST",
+        skipAuth: true,
       });
     } catch (error) {
       console.error("記錄瀏覽失敗:", error);
@@ -74,24 +60,15 @@ export const postService = {
   },
 
   uploadImage: async (file: File, slug?: string) => {
-    const token = localStorage.getItem("token");
     const formData = new FormData();
     formData.append("image", file);
     if (slug) {
       formData.append("slug", slug);
     }
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/`, {
+    return apiClient<{ uuid: string; image: string; alt_text: string }>("/upload/", {
       method: "POST",
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
       body: formData,
     });
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(errorData.detail || "圖片上傳失敗");
-    }
-    return res.json();
   },
 
   toggleLike: async (postId: number) => {
@@ -129,51 +106,23 @@ export const postService = {
   },
 
   createComment: async (postId: number, content: string) => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comments/`, {
+    return apiClient<Comment>("/comments/", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
       body: JSON.stringify({ post: postId, content }),
     });
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      const msg = errorData.content?.[0] || errorData.detail || "留言發送失敗";
-      throw new Error(msg);
-    }
-    return res.json();
   },
 
   updateComment: async (commentId: number, content: string) => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comments/${commentId}/`, {
+    return apiClient<Comment>(`/comments/${commentId}/`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
       body: JSON.stringify({ content }),
     });
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(errorData.detail || "更新留言失敗");
-    }
-    return res.json();
   },
 
   deleteComment: async (commentId: number) => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comments/${commentId}/`, {
+    await apiClient(`/comments/${commentId}/`, {
       method: "DELETE",
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
     });
-    if (!res.ok) {
-      throw new Error("刪除留言失敗");
-    }
     return true;
   },
 };

@@ -7,9 +7,9 @@ import remarkMath from "remark-math";
 import rehypeSlug from "rehype-slug";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
-import Image from "next/image";
 
 import { CodeBlock } from "@/components/markdown/CodeBlock";
 
@@ -21,6 +21,11 @@ interface ArticleBodyProps {
 }
 
 export function ArticleBody({ content }: ArticleBodyProps) {
+  const processedContent = content ? content.replace(
+    /(@fig-[\w-]+)/g,
+    (match) => match.replace("@", "#")
+  ) : "";
+
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -41,48 +46,46 @@ export function ArticleBody({ content }: ArticleBodyProps) {
   const components = {
     h2: ({ node, ...props }: any) => <motion.h2 variants={itemVariants} {...props} />,
     h3: ({ node, ...props }: any) => <motion.h3 variants={itemVariants} {...props} />,
-
     p: ({ children }: any) => <motion.p variants={itemVariants}>{children}</motion.p>,
     ul: ({ children }: any) => <motion.ul variants={itemVariants}>{children}</motion.ul>,
     ol: ({ children }: any) => <motion.ol variants={itemVariants}>{children}</motion.ol>,
     blockquote: ({ children }: any) => (
       <motion.blockquote variants={itemVariants}>{children}</motion.blockquote>
     ),
-
-    img: ({ node, src, alt, ...props }: any) => (
-      <motion.figure
-        variants={itemVariants}
-        className="my-8 flex w-full flex-col items-center justify-center"
-      >
-        <Image
-          src={src}
-          alt={alt || ""}
-          width={800}
-          height={600}
-          className="h-auto max-w-full rounded-lg border border-(--border) shadow-sm"
-          {...props}
-        />
-        {alt && (
-          <figcaption className="text-base-content/70 mt-3 w-full text-center text-sm not-italic">
-            {alt}
-          </figcaption>
-        )}
-      </motion.figure>
-    ),
-
     pre: ({ children, ...props }: any) => (
       <motion.div variants={itemVariants} className="w-full">
         <CodeBlock {...props}>{children}</CodeBlock>
       </motion.div>
     ),
-
     table: ({ children }: any) => <motion.table variants={itemVariants}>{children}</motion.table>,
+    img: ({ src, alt, width, height, id, style, ...props }: any) => (
+      <motion.figure
+        id={id}
+        variants={itemVariants}
+        className="my-8 flex w-full flex-col items-center justify-center [counter-increment:image-counter] scroll-mt-24"
+      >
+        <img
+          src={src}
+          alt={alt || ""}
+          width={width}
+          height={height}
+          style={{ ...style, border: "none", boxShadow: "none", outline: "none" }}
+          className="h-auto max-w-full transition-all duration-500 target:ring-4 target:ring-primary/50 target:rounded-xl p-2"
+          {...props}
+        />
+        {alt && (
+          <figcaption className="text-base-content/70 mt-3 w-full text-center text-sm not-italic before:font-bold before:content-['圖_'counter(image-counter)'：']">
+            {alt}
+          </figcaption>
+        )}
+      </motion.figure>
+    ),
   };
 
   return (
     <div className="flex w-full justify-center">
       <motion.article
-        className="prose prose-lg text-base-content w-full max-w-3xl"
+        className="prose prose-lg text-base-content w-full max-w-3xl [counter-reset:image-counter]"
         style={
           {
             "--tw-prose-body": "currentColor",
@@ -110,13 +113,14 @@ export function ArticleBody({ content }: ArticleBodyProps) {
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkMath]}
           rehypePlugins={[
+            rehypeRaw,
             rehypeSlug,
             rehypeHighlight,
             [rehypeKatex, { output: "html", displayMode: true }],
           ]}
           components={components}
         >
-          {content}
+          {processedContent}
         </ReactMarkdown>
       </motion.article>
     </div>

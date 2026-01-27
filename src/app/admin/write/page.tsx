@@ -75,13 +75,15 @@ export default function WritePage() {
     }
   };
 
-  const handleImageUpload = async (file: File, altText: string) => {
+  const handleImageUpload = async (file: File, altText: string, width: number, height: number) => {
     try {
       const result = await postService.uploadImage(file, slug);
-      const markdownImage = `![${altText}](${result.image})`;
-      insertMarkdown(markdownImage);
+      const figId = `fig-${Math.random().toString(36).substring(2, 8)}`;
+      const htmlImage = `<img src="${result.image}" id="${figId}" alt="${altText}" width="${width}" height="${height}" style="max-width: 100%; height: auto; margin: 2rem auto; display: block;">`;
+      insertMarkdown(htmlImage);
+      showToast(`圖片已插入，參照 ID: @${figId}`, "success");
     } catch (error) {
-      showToast("圖片上傳失敗，請檢查後端日誌", "error");
+      showToast("圖片上傳失敗", "error");
       throw error;
     }
   };
@@ -128,8 +130,13 @@ export default function WritePage() {
         formData.append("cover_image", coverImage);
       }
 
-      selectedCategories.forEach((cat) => formData.append("categories", cat.id.toString()));
-      selectedTags.forEach((tag) => formData.append("tags", tag.id.toString()));
+      if (selectedCategories.length > 0) {
+        formData.append("category_id", selectedCategories[0].id.toString());
+      }
+
+      selectedTags.forEach((tag) => {
+        formData.append("tags_ids", tag.id.toString());
+      });
 
       let response;
       if (currentSlug) {
@@ -142,7 +149,7 @@ export default function WritePage() {
       showToast(isDraft ? "草稿儲存成功" : "文章發布成功", "success");
       if (!isDraft) router.push("/");
     } catch (error) {
-      showToast("操作失敗，請檢查主控台", "error");
+      showToast("操作失敗", "error");
     } finally {
       setIsSubmitting(false);
     }
