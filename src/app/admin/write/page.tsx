@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import { postService } from "@/services/postService";
-import { Category, Tag } from "@/types";
+import { Category, Tag, Post } from "@/types";
 
 import { EditorHeader } from "@/app/admin/components/EditorHeader";
 import { MarkdownToolbar } from "@/app/admin/components/MarkdownToolbar";
@@ -16,13 +16,13 @@ import { ImageUploadModal } from "@/app/admin/components/ImageUploadModal";
 
 export default function WritePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isLoading } = useAuth();
   const { showToast } = useToast();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [currentSlug, setCurrentSlug] = useState<string | null>(null);
-
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [content, setContent] = useState("");
@@ -84,12 +84,35 @@ export default function WritePage() {
         ]);
         setAvailableCategories(cats);
         setAvailableTags(tags);
+
+        const editSlug = searchParams.get("edit");
+        if (editSlug) {
+          const posts = await postService.getAllPosts();
+          const postToEdit = posts.find((p: Post) => p.slug === editSlug);
+          
+          if (postToEdit) {
+            setCurrentSlug(postToEdit.slug);
+            setTitle(postToEdit.title);
+            setSlug(postToEdit.slug);
+            setContent(postToEdit.content);
+            setExcerpt(postToEdit.excerpt || "");
+            if (postToEdit.cover_image) {
+              setPreviewUrl(postToEdit.cover_image);
+            }
+            if (postToEdit.category) {
+              setSelectedCategories([postToEdit.category]);
+            }
+            if (postToEdit.tags) {
+              setSelectedTags(postToEdit.tags);
+            }
+          }
+        }
       } catch (error) {
-        showToast("載入分類標籤失敗", "error");
+        showToast("載入資料失敗", "error");
       }
     };
     fetchData();
-  }, [user, isLoading, router, showToast]);
+  }, [user, isLoading, router, showToast, searchParams]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
