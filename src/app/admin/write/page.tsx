@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
@@ -14,7 +14,7 @@ import { EditorPreview } from "@/app/admin/components/EditorPreview";
 import { EditorInput } from "@/app/admin/components/EditorInput";
 import { ImageUploadModal } from "@/app/admin/components/ImageUploadModal";
 
-export default function WritePage() {
+function WritePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoading } = useAuth();
@@ -87,8 +87,8 @@ export default function WritePage() {
 
         const editSlug = searchParams.get("edit");
         if (editSlug) {
-          const posts = await postService.getAllPosts();
-          const postToEdit = posts.find((p: Post) => p.slug === editSlug);
+          const allPosts = await postService.getAllPosts();
+          const postToEdit = allPosts.find((p: Post) => p.slug === editSlug);
           
           if (postToEdit) {
             setCurrentSlug(postToEdit.slug);
@@ -96,19 +96,24 @@ export default function WritePage() {
             setSlug(postToEdit.slug);
             setContent(postToEdit.content);
             setExcerpt(postToEdit.excerpt || "");
+            
             if (postToEdit.cover_image) {
               setPreviewUrl(postToEdit.cover_image);
             }
+            
             if (postToEdit.category) {
               setSelectedCategories([postToEdit.category]);
             }
-            if (postToEdit.tags) {
+
+            if (postToEdit.tags && postToEdit.tags.length > 0) {
               setSelectedTags(postToEdit.tags);
             }
+          } else {
+            showToast("找不到該文章內容", "error");
           }
         }
       } catch (error) {
-        showToast("載入資料失敗", "error");
+        showToast("載入文章內容失敗", "error");
       }
     };
     fetchData();
@@ -188,19 +193,16 @@ export default function WritePage() {
         formData.append("tags_ids", tag.id.toString());
       });
 
-      let response;
       if (s.currentSlug) {
-        response = await postService.updatePost(s.currentSlug, formData);
+        await postService.updatePost(s.currentSlug, formData);
       } else {
-        response = await postService.createPost(formData);
+        const response = await postService.createPost(formData);
         setCurrentSlug(response.slug);
       }
 
       if (!silent) {
         showToast(isDraft ? "草稿儲存成功" : "文章發布成功", "success");
-        if (!isDraft) router.push("/");
-      } else {
-        console.log("Auto-saved at", new Date().toLocaleTimeString());
+        if (!isDraft) router.push("/admin/manage");
       }
     } catch (error) {
       if (!silent) showToast("操作失敗", "error");
@@ -248,8 +250,6 @@ export default function WritePage() {
       showToast("創建標籤失敗", "error");
     }
   };
-
-  if (isLoading) return null;
 
   return (
     <div className="bg-background text-foreground flex h-screen flex-col">
@@ -316,5 +316,13 @@ export default function WritePage() {
         onUpload={handleImageUpload}
       />
     </div>
+  );
+}
+
+export default function WritePage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center">載入中...</div>}>
+      <WritePageContent />
+    </Suspense>
   );
 }
