@@ -2,6 +2,10 @@ import { apiClient } from "./apiClient";
 import { Category, Post, Tag, Comment } from "@/types";
 
 export const postService = {
+  getAllPosts: async () => {
+    return apiClient<Post[]>("/posts/", { skipAuth: false });
+  },
+
   createPost: async (formData: FormData) => {
     return apiClient<Post>("/posts/", {
       method: "POST",
@@ -25,6 +29,13 @@ export const postService = {
     } catch (error) {
       console.error("記錄瀏覽失敗:", error);
     }
+  },
+
+  updatePostStatus: async (slug: string, statusData: { is_draft?: boolean, is_published?: boolean, is_archived?: boolean }) => {
+    return apiClient<Post>(`/posts/${slug}/`, {
+      method: "PATCH",
+      body: JSON.stringify(statusData),
+    });
   },
 
   getPublishedPosts: async () => {
