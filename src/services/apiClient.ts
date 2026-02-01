@@ -42,29 +42,32 @@ export async function apiClient<T>(endpoint: string, options: FetchOptions = {})
   });
 
   const isLoginRequest = cleanEndpoint.includes("/login/");
+  const isRefreshRequest = cleanEndpoint.includes("/refresh/");
 
-  if (response.status === 401 && !skipAuth && !isLoginRequest) {
+  if ((response.status === 401 || response.status === 403) && !skipAuth && !isLoginRequest && !isRefreshRequest) {
     const refreshToken = typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null;
 
     if (!refreshToken) {
       if (typeof window !== "undefined") {
         localStorage.clear();
         if (window.location.pathname !== "/login") {
-          window.location.href = "/login";
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
         }
       }
       throw new Error("Session expired");
     }
 
     if (isRefreshing) {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         subscribeTokenRefresh((newToken) => {
-          resolve(
-            fetch(`${BASE_URL}${cleanEndpoint}`, {
-              ...fetchOptions,
-              headers: getHeaders(newToken),
-            }).then((res) => res.json())
-          );
+          if (!newToken) return reject(new Error("Refresh failed"));
+          fetch(`${BASE_URL}${cleanEndpoint}`, {
+            ...fetchOptions,
+            headers: getHeaders(newToken),
+          })
+            .then((res) => res.json())
+            .then(resolve)
+            .catch(reject);
         });
       });
     }
@@ -90,8 +93,9 @@ export async function apiClient<T>(endpoint: string, options: FetchOptions = {})
         return retryResponse.json();
       } else {
         localStorage.clear();
+        onRefreshed("");
         if (window.location.pathname !== "/login") {
-          window.location.href = "/login";
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
         }
         throw new Error("Refresh token invalid");
       }
