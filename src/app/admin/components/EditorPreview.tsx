@@ -116,10 +116,10 @@ export function EditorPreview({ content }: EditorPreviewProps) {
     ),
     warning: ({ children, title }: any) => (
       <div 
-        className="my-6 rounded-r-lg border-l-4 bg-[#ebcb8b]/5 p-4 dark:bg-[#ebcb8b]/10"
-        style={{ borderColor: "#ebcb8b" }}
+        className="my-6 rounded-r-lg border-l-4 bg-[#fcb700]/5 p-4 dark:bg-[#fcb700]/10"
+        style={{ borderColor: "#fcb700" }}
       >
-        <div className="flex items-center gap-2 mb-2 font-bold text-[#ebcb8b] text-sm tracking-widest uppercase">
+        <div className="flex items-center gap-2 mb-2 font-bold text-[#fcb700] text-sm tracking-widest uppercase">
           <AlertTriangle className="h-4 w-4" /> {title || "WARNING"}
         </div>
         <div className="text-foreground/80">{children}</div>
