@@ -13,16 +13,17 @@ import {
   Sigma,
   Image as ImageIcon,
   Link as LinkIcon,
+  Info,
+  HelpCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { ToolbarButton } from "./ToolbarButton";
 
-// Markdown 工具列組件
 interface MarkdownToolbarProps {
   onInsert: (prefix: string, suffix?: string) => void;
   onImageClick?: () => void;
 }
 
-// Markdown 工具列組件
 export function MarkdownToolbar({ onInsert, onImageClick }: MarkdownToolbarProps) {
   return (
     <div className="bg-card/50 flex shrink-0 items-center gap-1 overflow-x-auto border-b border-[color:var(--border)] p-2">
@@ -37,7 +38,7 @@ export function MarkdownToolbar({ onInsert, onImageClick }: MarkdownToolbarProps
         tooltip="斜體"
       />
 
-      <div className="mx-1 h-4 w-px bg-[(--border)]" />
+      <div className="mx-1 h-4 w-px bg-[color:var(--border)]" />
 
       <ToolbarButton
         onClick={() => onInsert("# ")}
@@ -70,7 +71,25 @@ export function MarkdownToolbar({ onInsert, onImageClick }: MarkdownToolbarProps
         tooltip="有序清單"
       />
 
-      <div className="mx-1 h-4 w-px bg-[(--border)]" />
+      <div className="mx-1 h-4 w-px bg-[color:var(--border)]" />
+
+      <ToolbarButton
+        onClick={() => onInsert(':::note{title=""}\n', "\n:::")}
+        icon={<Info className="h-4 w-4" />}
+        tooltip="提示 (Note)"
+      />
+      <ToolbarButton
+        onClick={() => onInsert(':::question{title=""}\n', "\n:::")}
+        icon={<HelpCircle className="h-4 w-4" />}
+        tooltip="問題 (Question)"
+      />
+      <ToolbarButton
+        onClick={() => onInsert(':::warning{title=""}\n', "\n:::")}
+        icon={<AlertTriangle className="h-4 w-4" />}
+        tooltip="警告 (Warning)"
+      />
+
+      <div className="mx-1 h-4 w-px bg-[color:var(--border)]" />
 
       <ToolbarButton
         onClick={() => onInsert("```\n", "\n```")}
@@ -83,7 +102,7 @@ export function MarkdownToolbar({ onInsert, onImageClick }: MarkdownToolbarProps
         tooltip="數學公式"
       />
 
-      <div className="mx-1 h-4 w-px bg-[(--border)]" />
+      <div className="mx-1 h-4 w-px bg-[color:var(--border)]" />
 
       <ToolbarButton
         onClick={() => (onImageClick ? onImageClick() : onInsert("![圖片描述](url)"))}

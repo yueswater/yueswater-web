@@ -67,7 +67,7 @@ export function LikeSection({ postId, initialLikes, isLiked = false }: LikeSecti
           disabled={isLoading}
           className={`group relative flex h-16 w-16 items-center justify-center rounded-full border-2 transition-all duration-300 ${
             liked
-              ? "border-[#f82834] bg-red-50 text-[#f82834]"
+              ? "border-[#bf616a] bg-red-50 text-[#bf616a]"
               : "text-base-content/50 border-base-content/10 hover:border-[#ff6266] hover:text-[#ff6266]"
           } `}
         >

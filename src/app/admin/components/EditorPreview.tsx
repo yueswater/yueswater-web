@@ -4,6 +4,8 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
+import remarkDirective from "remark-directive";
+import { visit } from "unist-util-visit";
 import rehypeSlug from "rehype-slug";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
@@ -11,12 +13,31 @@ import rehypeRaw from "rehype-raw";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { CodeBlock } from "@/components/markdown/CodeBlock";
+import { Info, HelpCircle, AlertTriangle } from "lucide-react";
 
 import "highlight.js/styles/nord.css";
 import "katex/dist/katex.min.css";
 
 interface EditorPreviewProps {
   content: string;
+}
+
+function admonitionPlugin() {
+  return (tree: any) => {
+    visit(tree, (node) => {
+      if (
+        node.type === "containerDirective" ||
+        node.type === "leafDirective" ||
+        node.type === "textDirective"
+      ) {
+        const data = node.data || (node.data = {});
+        data.hName = node.name;
+        data.hProperties = {
+          title: node.attributes?.title || ""
+        };
+      }
+    });
+  };
 }
 
 export function EditorPreview({ content }: EditorPreviewProps) {
@@ -71,6 +92,39 @@ export function EditorPreview({ content }: EditorPreviewProps) {
         )}
       </motion.figure>
     ),
+    note: ({ children, title }: any) => (
+      <div 
+        className="my-6 rounded-r-lg border-l-4 bg-[#5e81ac]/5 p-4 dark:bg-[#5e81ac]/10"
+        style={{ borderColor: "#5e81ac" }}
+      >
+        <div className="flex items-center gap-2 mb-2 font-bold text-[#5e81ac] text-sm tracking-widest uppercase">
+          <Info className="h-4 w-4" /> {title || "NOTE"}
+        </div>
+        <div className="text-foreground/80">{children}</div>
+      </div>
+    ),
+    question: ({ children, title }: any) => (
+      <div 
+        className="my-6 rounded-r-lg border-l-4 bg-[#bf616a]/5 p-4 dark:bg-[#bf616a]/10"
+        style={{ borderColor: "#bf616a" }}
+      >
+        <div className="flex items-center gap-2 mb-2 font-bold text-[#bf616a] text-sm tracking-widest uppercase">
+          <HelpCircle className="h-4 w-4" /> {title || "QUESTION"}
+        </div>
+        <div className="text-foreground/80">{children}</div>
+      </div>
+    ),
+    warning: ({ children, title }: any) => (
+      <div 
+        className="my-6 rounded-r-lg border-l-4 bg-[#ebcb8b]/5 p-4 dark:bg-[#ebcb8b]/10"
+        style={{ borderColor: "#ebcb8b" }}
+      >
+        <div className="flex items-center gap-2 mb-2 font-bold text-[#ebcb8b] text-sm tracking-widest uppercase">
+          <AlertTriangle className="h-4 w-4" /> {title || "WARNING"}
+        </div>
+        <div className="text-foreground/80">{children}</div>
+      </div>
+    ),
   };
 
   return (
@@ -98,7 +152,7 @@ export function EditorPreview({ content }: EditorPreviewProps) {
       }
     >
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkMath]}
+        remarkPlugins={[remarkGfm, remarkMath, remarkDirective, admonitionPlugin]}
         rehypePlugins={[
           rehypeRaw,
           rehypeSlug,
@@ -107,7 +161,7 @@ export function EditorPreview({ content }: EditorPreviewProps) {
         ]}
         components={components}
       >
-        {processedContent || "*預覽內容將顯示於此...*"}
+        {processedContent || "預覽內容將顯示於此..."}
       </ReactMarkdown>
     </article>
   );

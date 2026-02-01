@@ -14,7 +14,7 @@ interface ToastProps {
 export function Toast({ message, type, onClose }: ToastProps) {
   const iconMap = {
     success: <CheckCircle className="h-5 w-5 text-[#66cc8a]" />,
-    error: <AlertCircle className="h-5 w-5 text-[#f82834]" />,
+    error: <AlertCircle className="h-5 w-5 text-[#bf616a]" />,
     info: <Info className="h-5 w-5 text-[#4ea0ff]" />,
   };
 
