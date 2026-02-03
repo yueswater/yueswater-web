@@ -41,10 +41,12 @@ function admonitionPlugin() {
 }
 
 export function EditorPreview({ content }: EditorPreviewProps) {
-  const processedContent = content ? content.replace(
-    /(@fig-[\w-]+)/g,
-    (match) => match.replace("@", "#")
-  ) : "";
+  const processedContent = content 
+    ? content
+        .replace(/(@fig-[\w-]+)/g, (match) => match.replace("@", "#"))
+        .replace(/([\u4e00-\u9fa5])(`)/g, "$1 $2")
+        .replace(/(`)([\u4e00-\u9fa5])/g, "$1 $2")
+    : "";
 
   const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
@@ -64,6 +66,19 @@ export function EditorPreview({ content }: EditorPreviewProps) {
     blockquote: ({ children }: any) => (
       <motion.blockquote variants={itemVariants}>{children}</motion.blockquote>
     ),
+    code: ({ node, inline, className, children, ...props }: any) => {
+      if (inline) {
+        return (
+          <code
+            className="rounded bg-primary/10 px-1.5 py-0.5 font-mono text-sm font-bold text-primary"
+            {...props}
+          >
+            {children}
+          </code>
+        );
+      }
+      return <code className={className} {...props}>{children}</code>;
+    },
     pre: ({ children, ...props }: any) => (
       <motion.div variants={itemVariants}>
         <CodeBlock {...props}>{children}</CodeBlock>
@@ -94,10 +109,10 @@ export function EditorPreview({ content }: EditorPreviewProps) {
     ),
     note: ({ children, title }: any) => (
       <div 
-        className="my-6 rounded-r-lg border-l-4 bg-[#5e81ac]/5 p-4 dark:bg-[#5e81ac]/10"
-        style={{ borderColor: "#5e81ac" }}
+        className="my-6 rounded-r-lg border-l-4 bg-[#135bf9]/5 p-4 dark:bg-[#135bf9]/10 border-solid"
+        style={{ borderColor: "#135bf9" }}
       >
-        <div className="flex items-center gap-2 mb-2 font-bold text-[#5e81ac] text-sm tracking-widest uppercase">
+        <div className="flex items-center gap-2 mb-2 font-bold text-[#135bf9] text-sm tracking-widest uppercase">
           <Info className="h-4 w-4" /> {title || "NOTE"}
         </div>
         <div className="text-foreground/80">{children}</div>
@@ -105,10 +120,10 @@ export function EditorPreview({ content }: EditorPreviewProps) {
     ),
     question: ({ children, title }: any) => (
       <div 
-        className="my-6 rounded-r-lg border-l-4 bg-[#bf616a]/5 p-4 dark:bg-[#bf616a]/10"
-        style={{ borderColor: "#bf616a" }}
+        className="my-6 rounded-r-lg border-l-4 bg-[#f82834]/5 p-4 dark:bg-[#f82834]/10 border-solid"
+        style={{ borderColor: "#f82834" }}
       >
-        <div className="flex items-center gap-2 mb-2 font-bold text-[#bf616a] text-sm tracking-widest uppercase">
+        <div className="flex items-center gap-2 mb-2 font-bold text-[#f82834] text-sm tracking-widest uppercase">
           <HelpCircle className="h-4 w-4" /> {title || "QUESTION"}
         </div>
         <div className="text-foreground/80">{children}</div>
@@ -116,7 +131,7 @@ export function EditorPreview({ content }: EditorPreviewProps) {
     ),
     warning: ({ children, title }: any) => (
       <div 
-        className="my-6 rounded-r-lg border-l-4 bg-[#fcb700]/5 p-4 dark:bg-[#fcb700]/10"
+        className="my-6 rounded-r-lg border-l-4 bg-[#fcb700]/5 p-4 dark:bg-[#fcb700]/10 border-solid"
         style={{ borderColor: "#fcb700" }}
       >
         <div className="flex items-center gap-2 mb-2 font-bold text-[#fcb700] text-sm tracking-widest uppercase">
@@ -129,7 +144,7 @@ export function EditorPreview({ content }: EditorPreviewProps) {
 
   return (
     <article
-      className="prose prose-lg dark:prose-invert w-full max-none [counter-reset:image-counter]"
+      className="prose prose-lg dark:prose-invert w-full max-none [counter-reset:image-counter] prose-code:before:content-none prose-code:after:content-none"
       style={
         {
           "--tw-prose-body": "currentColor",
@@ -161,7 +176,7 @@ export function EditorPreview({ content }: EditorPreviewProps) {
         ]}
         components={components}
       >
-        {processedContent || "預覽內容將顯示於此..."}
+        {processedContent || "*預覽內容將顯示於此...*"}
       </ReactMarkdown>
     </article>
   );
