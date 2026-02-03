@@ -1,6 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+
 @import "katex/dist/katex.min.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+@layer base {
+  code, pre, kbd, samp {
+    font-family: theme('fontFamily.mono');
+    font-variant-ligatures: contextual;
+  }
+}
 
 :root {
   --background: 255 255 255;

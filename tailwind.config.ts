@@ -12,6 +12,7 @@ const config: Config & { daisyui?: any } = {
       fontFamily: {
         sans: ["var(--font-gen-jyuu)", "system-ui", "sans-serif"],
         noto: ["var(--font-noto-sans)", "sans-serif"],
+        mono: ["Fira Code", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
       },
     },
   },
