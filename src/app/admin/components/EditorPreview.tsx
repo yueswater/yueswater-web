@@ -64,7 +64,15 @@ export function EditorPreview({ content }: EditorPreviewProps) {
     ul: ({ children }: any) => <motion.ul variants={itemVariants}>{children}</motion.ul>,
     ol: ({ children }: any) => <motion.ol variants={itemVariants}>{children}</motion.ol>,
     blockquote: ({ children }: any) => (
-      <motion.blockquote variants={itemVariants}>{children}</motion.blockquote>
+      <motion.blockquote 
+        variants={itemVariants} 
+        className="font-serif italic text-foreground/80 border-l-4 border-primary/20 pl-4"
+      >
+        {children}
+      </motion.blockquote>
+    ),
+    em: ({ children }: any) => (
+      <em className="font-serif italic opacity-90">{children}</em>
     ),
     code: ({ node, inline, className, children, ...props }: any) => {
       if (inline) {
@@ -77,7 +85,7 @@ export function EditorPreview({ content }: EditorPreviewProps) {
           </code>
         );
       }
-      return <code className={className} {...props}>{children}</code>;
+      return <code className={`${className} font-mono`} {...props}>{children}</code>;
     },
     pre: ({ children, ...props }: any) => (
       <motion.div variants={itemVariants}>
@@ -144,7 +152,7 @@ export function EditorPreview({ content }: EditorPreviewProps) {
 
   return (
     <article
-      className="prose prose-lg dark:prose-invert w-full max-none [counter-reset:image-counter] prose-code:before:content-none prose-code:after:content-none"
+      className="prose prose-lg dark:prose-invert w-full max-none [counter-reset:image-counter] prose-code:before:content-none prose-code:after:content-none prose-em:font-serif"
       style={
         {
           "--tw-prose-body": "currentColor",
@@ -176,7 +184,7 @@ export function EditorPreview({ content }: EditorPreviewProps) {
         ]}
         components={components}
       >
-        {processedContent || "*預覽內容將顯示於此...*"}
+        {processedContent || "預覽內容將顯示於此..."}
       </ReactMarkdown>
     </article>
   );
