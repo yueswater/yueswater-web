@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, ArrowRight, Tag, User, TagIcon } from "lucide-react";
+import { Calendar, ArrowRight, Tag, User, TagIcon, RefreshCw } from "lucide-react";
 import { Post } from "@/types";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
@@ -16,16 +16,22 @@ interface PostCardProps {
 export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
   const postLink = `/posts/${post.slug}`;
 
-  // 安全地處理日期
-  const formattedDate = post.published_at
-    ? new Date(post.published_at).toLocaleDateString("zh-TW", {
+  const formattedDate = new Date(post.created_at).toLocaleDateString("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+  const formattedUpdateDate = post.updated_at 
+    ? new Date(post.updated_at).toLocaleDateString("zh-TW", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
       })
-    : new Date(post.created_at).toLocaleDateString("zh-TW");
+    : null;
 
-  // Hero 卡片動畫
+  const showUpdate = formattedUpdateDate && formattedUpdateDate !== formattedDate;
+
   const heroTitleVariants: Variants = {
     hidden: { opacity: 0, x: -10 },
     visible: {
@@ -53,9 +59,6 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
     },
   };
 
-  // =================================================================
-  // 1. Hero 模式
-  // =================================================================
   if (variant === "hero") {
     return (
       <motion.article
@@ -84,7 +87,7 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
 
         <div className="flex flex-col justify-center gap-4 p-6 md:p-10">
           <motion.div
-            className="flex items-center gap-3"
+            className="flex flex-wrap items-center gap-3"
             variants={heroTitleVariants}
             initial="hidden"
             whileInView="visible"
@@ -97,6 +100,12 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
               <Calendar className="h-4 w-4" />
               <time>{formattedDate}</time>
             </div>
+            {showUpdate && (
+              <div className="text-foreground/40 flex items-center gap-1.5 text-sm">
+                <RefreshCw className="h-3.5 w-3.5" />
+                <time>{formattedUpdateDate}</time>
+              </div>
+            )}
           </motion.div>
 
           <motion.h2
@@ -157,9 +166,6 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
     );
   }
 
-  // =================================================================
-  // 2. Sidebar 模式
-  // =================================================================
   if (variant === "sidebar") {
     return (
       <motion.article
@@ -184,15 +190,23 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
               {post.title}
             </Link>
           </h3>
-          <time className="text-foreground/40 mt-1 block text-xs">{formattedDate}</time>
+          <div className="flex items-center gap-3 mt-1">
+            <div className="text-foreground/40 flex items-center gap-1 text-[10px]">
+              <Calendar className="h-3 w-3" />
+              <time>{formattedDate}</time>
+            </div>
+            {showUpdate && (
+              <div className="text-foreground/30 flex items-center gap-1 text-[10px]">
+                <RefreshCw className="h-2.5 w-2.5" />
+                <time>{formattedUpdateDate}</time>
+              </div>
+            )}
+          </div>
         </div>
       </motion.article>
     );
   }
 
-  // =================================================================
-  // 3. List 模式 (修正分類顯示與新增標籤)
-  // =================================================================
   if (variant === "list") {
     return (
       <motion.article
@@ -203,12 +217,10 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
         transition={{ duration: 0.3 }}
       >
         <div className="flex flex-col gap-3">
-          {/* 標題 */}
           <h2 className="text-foreground group-hover:text-primary text-2xl font-bold transition-colors md:text-3xl">
             <Link href={postLink}>{post.title}</Link>
           </h2>
 
-          {/* 新增：標籤列表 (在標題下方) */}
           {post.tags && post.tags.length > 0 && (
             <div className="mb-1 flex flex-wrap gap-2">
               {post.tags.map((tag) => (
@@ -222,7 +234,6 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
             </div>
           )}
 
-          {/* Metadata 行 (作者、日期、分類) */}
           <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium">
             <span className="flex items-center gap-1.5">
               <User className="text-muted-foreground/60 h-4 w-4" />
@@ -233,6 +244,13 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
               <Calendar className="text-muted-foreground/60 h-4 w-4" />
               {formattedDate}
             </span>
+
+            {showUpdate && (
+              <span className="flex items-center gap-1.5 text-muted-foreground/40">
+                <RefreshCw className="h-3.5 w-3.5" />
+                {formattedUpdateDate}
+              </span>
+            )}
 
             <div className="flex items-center gap-1.5">
               <TagIcon className="text-muted-foreground/60 h-4 w-4" />
@@ -248,7 +266,6 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
             </div>
           </div>
 
-          {/* 摘要 */}
           <p className="text-foreground/70 mt-1 line-clamp-3 leading-relaxed md:line-clamp-2">
             {post.excerpt || post.content.replace(/[#*`]/g, "").substring(0, 120) + "..."}
           </p>
@@ -257,9 +274,6 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
     );
   }
 
-  // =================================================================
-  // 4. Grid 模式
-  // =================================================================
   return (
     <motion.article
       className="group bg-card relative flex h-full w-full flex-col overflow-hidden rounded-lg transition-all duration-300 hover:shadow-lg sm:max-w-xs md:max-w-sm"
@@ -322,19 +336,30 @@ export function PostCard({ post, variant = "grid", ranking }: PostCardProps) {
         </motion.p>
 
         <motion.div
-          className="text-foreground/40 mt-2 flex items-center justify-between border-t border-[color:var(--border)] pt-2 text-[10px] font-medium tracking-widest uppercase"
+          className="text-foreground/40 mt-2 border-t border-[color:var(--border)] pt-2 text-[10px] font-medium tracking-widest uppercase"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
         >
-          <div className="flex min-w-0 items-center gap-1.5">
-            <div className="bg-primary/10 text-primary flex h-4 w-4 shrink-0 items-center justify-center rounded-full">
-              <User className="h-2.5 w-2.5" />
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex min-w-0 items-center gap-1.5">
+              <div className="bg-primary/10 text-primary flex h-4 w-4 shrink-0 items-center justify-center rounded-full">
+                <User className="h-2.5 w-2.5" />
+              </div>
+              <span className="truncate">{post.author.username}</span>
             </div>
-            <span className="truncate">{post.author.username}</span>
+            <div className="flex items-center gap-1">
+              <Calendar className="h-2.5 w-2.5" />
+              <time>{formattedDate}</time>
+            </div>
           </div>
-          <time className="shrink-0">{formattedDate}</time>
+          {showUpdate && (
+            <div className="flex items-center justify-end gap-1 text-foreground/30">
+              <RefreshCw className="h-2 w-2" />
+              <time>{formattedUpdateDate}</time>
+            </div>
+          )}
         </motion.div>
       </div>
     </motion.article>
