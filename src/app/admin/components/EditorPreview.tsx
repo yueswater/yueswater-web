@@ -13,7 +13,7 @@ import rehypeRaw from "rehype-raw";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { CodeBlock } from "@/components/markdown/CodeBlock";
-import { Info, HelpCircle, AlertTriangle } from "lucide-react";
+import { Info, HelpCircle, AlertTriangle, Lightbulb, Skull, FlaskConical } from "lucide-react";
 
 import "highlight.js/styles/nord.css";
 import "katex/dist/katex.min.css";
@@ -56,6 +56,18 @@ export function EditorPreview({ content }: EditorPreviewProps) {
       transition: { duration: 0.6, ease: "easeOut" },
     },
   };
+
+  const Admonition = ({ children, title, color, icon: Icon, label }: any) => (
+    <div 
+      className="my-6 rounded-r-lg border-l-4 p-4 border-solid text-left"
+      style={{ backgroundColor: `${color}10`, borderColor: color }}
+    >
+      <div className="flex items-center gap-2 mb-2 font-bold text-sm tracking-widest uppercase" style={{ color: color }}>
+        <Icon className="h-4 w-4" /> {title || label}
+      </div>
+      <div className="text-foreground/80">{children}</div>
+    </div>
+  );
 
   const components = {
     h2: ({ node, ...props }: any) => <motion.h2 variants={itemVariants} {...props} />,
@@ -115,39 +127,13 @@ export function EditorPreview({ content }: EditorPreviewProps) {
         )}
       </motion.figure>
     ),
-    note: ({ children, title }: any) => (
-      <div 
-        className="my-6 rounded-r-lg border-l-4 bg-[#135bf9]/5 p-4 dark:bg-[#135bf9]/10 border-solid"
-        style={{ borderColor: "#135bf9" }}
-      >
-        <div className="flex items-center gap-2 mb-2 font-bold text-[#135bf9] text-sm tracking-widest uppercase">
-          <Info className="h-4 w-4" /> {title || "NOTE"}
-        </div>
-        <div className="text-foreground/80">{children}</div>
-      </div>
-    ),
-    question: ({ children, title }: any) => (
-      <div 
-        className="my-6 rounded-r-lg border-l-4 bg-[#f82834]/5 p-4 dark:bg-[#f82834]/10 border-solid"
-        style={{ borderColor: "#f82834" }}
-      >
-        <div className="flex items-center gap-2 mb-2 font-bold text-[#f82834] text-sm tracking-widest uppercase">
-          <HelpCircle className="h-4 w-4" /> {title || "QUESTION"}
-        </div>
-        <div className="text-foreground/80">{children}</div>
-      </div>
-    ),
-    warning: ({ children, title }: any) => (
-      <div 
-        className="my-6 rounded-r-lg border-l-4 bg-[#fcb700]/5 p-4 dark:bg-[#fcb700]/10 border-solid"
-        style={{ borderColor: "#fcb700" }}
-      >
-        <div className="flex items-center gap-2 mb-2 font-bold text-[#fcb700] text-sm tracking-widest uppercase">
-          <AlertTriangle className="h-4 w-4" /> {title || "WARNING"}
-        </div>
-        <div className="text-foreground/80">{children}</div>
-      </div>
-    ),
+    note: (props: any) => <Admonition {...props} color="#448aff" icon={Info} label="NOTE" />,
+    info: (props: any) => <Admonition {...props} color="#06b8d4" icon={Info} label="INFO" />,
+    tip: (props: any) => <Admonition {...props} color="#01bfa5" icon={Lightbulb} label="TIP" />,
+    question: (props: any) => <Admonition {...props} color="#64dd17" icon={HelpCircle} label="QUESTION" />,
+    warning: (props: any) => <Admonition {...props} color="#ff9101" icon={AlertTriangle} label="WARNING" />,
+    danger: (props: any) => <Admonition {...props} color="#ff1844" icon={Skull} label="DANGER" />,
+    example: (props: any) => <Admonition {...props} color="#7d4dff" icon={FlaskConical} label="EXAMPLE" />,
   };
 
   return (
@@ -182,7 +168,7 @@ export function EditorPreview({ content }: EditorPreviewProps) {
           rehypeHighlight,
           [rehypeKatex, { output: "html", displayMode: true }],
         ]}
-        components={components}
+        components={components as any}
       >
         {processedContent || "預覽內容將顯示於此..."}
       </ReactMarkdown>
