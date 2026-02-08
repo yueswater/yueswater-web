@@ -13,6 +13,7 @@ import rehypeRaw from "rehype-raw";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { CodeBlock } from "@/components/markdown/CodeBlock";
+import { LatexEditor } from "@/components/markdown/LatexEditor";
 import { Info, HelpCircle, AlertTriangle, Lightbulb, Skull, FlaskConical } from "lucide-react";
 
 import "highlight.js/styles/nord.css";
@@ -77,14 +78,35 @@ export function ArticleBody({ content }: ArticleBodyProps) {
     </div>
   );
 
+  const extractText = (nodes: any): string => {
+    return React.Children.toArray(nodes).map((child: any) => {
+      if (typeof child === "string") return child;
+      if (typeof child === "number") return String(child);
+      if (child?.props?.children) return extractText(child.props.children);
+      if (Array.isArray(child)) return extractText(child);
+      return "";
+    }).join("\n");
+  };
+
   const components = {
     h2: ({ node, ...props }: any) => <motion.h2 variants={itemVariants} {...props} />,
     h3: ({ node, ...props }: any) => <motion.h3 variants={itemVariants} {...props} />,
-    p: ({ children }: any) => <motion.p variants={itemVariants}>{children}</motion.p>,
+    p: ({ children }: any) => {
+      const isSpecial = React.Children.toArray(children).some((child: any) => 
+        child?.type === LatexEditor || child?.type?.name === "LatexEditor" || child?.type === "figure" || child?.props?.id?.startsWith("fig-")
+      );
+      if (isSpecial) return <>{children}</>;
+      return <motion.p variants={itemVariants}>{children}</motion.p>;
+    },
     ul: ({ children }: any) => <motion.ul variants={itemVariants}>{children}</motion.ul>,
     ol: ({ children }: any) => <motion.ol variants={itemVariants}>{children}</motion.ol>,
     blockquote: ({ children }: any) => (
-      <motion.blockquote variants={itemVariants}>{children}</motion.blockquote>
+      <motion.blockquote variants={itemVariants} className="font-serif italic text-foreground/80 border-l-4 border-primary/20 pl-4">
+        {children}
+      </motion.blockquote>
+    ),
+    em: ({ children }: any) => (
+      <em className="font-serif italic opacity-90">{children}</em>
     ),
     code: ({ node, inline, className, children, ...props }: any) => {
       if (inline) {
@@ -97,7 +119,7 @@ export function ArticleBody({ content }: ArticleBodyProps) {
           </code>
         );
       }
-      return <code className={className} {...props}>{children}</code>;
+      return <code className={`${className} font-mono`} {...props}>{children}</code>;
     },
     pre: ({ children, ...props }: any) => (
       <motion.div variants={itemVariants} className="w-full">
@@ -109,7 +131,7 @@ export function ArticleBody({ content }: ArticleBodyProps) {
       <motion.figure
         id={id}
         variants={itemVariants}
-        className="my-8 flex w-full flex-col items-center justify-center [counter-increment:image-counter] scroll-mt-24"
+        className="my-8 flex w-full flex-col items-center justify-center [counter-increment:image-counter] scroll-mt-24 text-center"
       >
         <img
           src={src}
@@ -117,7 +139,7 @@ export function ArticleBody({ content }: ArticleBodyProps) {
           width={width}
           height={height}
           style={{ ...style, border: "none", boxShadow: "none", outline: "none" }}
-          className="h-auto max-w-full transition-all duration-500 target:ring-4 target:ring-primary/50 target:rounded-xl p-2"
+          className="h-auto max-w-full transition-all duration-500 target:ring-4 target:ring-primary/50 target:rounded-xl p-2 mx-auto"
           {...props}
         />
         {alt && (
@@ -127,6 +149,22 @@ export function ArticleBody({ content }: ArticleBodyProps) {
         )}
       </motion.figure>
     ),
+    latex: ({ children }: any) => {
+      const rawText = extractText(children);
+      const cleanText = rawText
+        .split("\n")
+        .map(line => line.trim())
+        .join("\n")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&amp;/g, "&");
+      
+      return (
+        <div className="w-full max-w-none my-8">
+           <LatexEditor initialCode={cleanText} />
+        </div>
+      );
+    },
     note: (props: any) => <Admonition {...props} color="#448aff" icon={Info} label="NOTE" />,
     info: (props: any) => <Admonition {...props} color="#06b8d4" icon={Info} label="INFO" />,
     tip: (props: any) => <Admonition {...props} color="#01bfa5" icon={Lightbulb} label="TIP" />,
@@ -137,27 +175,27 @@ export function ArticleBody({ content }: ArticleBodyProps) {
   };
 
   return (
-    <div className="flex w-full justify-center">
+    <div className="flex w-full justify-center text-left">
       <motion.article
-        className="prose prose-lg text-base-content w-full max-w-3xl [counter-reset:image-counter] prose-code:before:content-none prose-code:after:content-none"
+        className="prose prose-lg text-base-content w-full max-w-none [counter-reset:image-counter] prose-code:before:content-none prose-code:after:content-none prose-em:font-serif"
         style={
           {
-            "--tw-prose-body": "currentColor",
-            "--tw-prose-headings": "currentColor",
-            "--tw-prose-lead": "currentColor",
+            "--tw-prose-body": "oklch(var(--bc))",
+            "--tw-prose-headings": "oklch(var(--bc))",
+            "--tw-prose-lead": "oklch(var(--bc))",
             "--tw-prose-links": "oklch(var(--p))",
-            "--tw-prose-bold": "currentColor",
-            "--tw-prose-counters": "currentColor",
-            "--tw-prose-bullets": "currentColor",
-            "--tw-prose-hr": "currentColor",
-            "--tw-prose-quotes": "currentColor",
-            "--tw-prose-quote-borders": "transparent",
-            "--tw-prose-captions": "currentColor",
+            "--tw-prose-bold": "oklch(var(--bc))",
+            "--tw-prose-counters": "oklch(var(--bc))",
+            "--tw-prose-bullets": "oklch(var(--bc))",
+            "--tw-prose-hr": "oklch(var(--bc))",
+            "--tw-prose-quotes": "oklch(var(--bc))",
+            "--tw-prose-quote-borders": "oklch(var(--p))",
+            "--tw-prose-captions": "oklch(var(--bc))",
             "--tw-prose-code": "oklch(var(--p))",
-            "--tw-prose-pre-code": "currentColor",
+            "--tw-prose-pre-code": "oklch(var(--bc))",
             "--tw-prose-pre-bg": "#2e3440",
-            "--tw-prose-th-borders": "currentColor",
-            "--tw-prose-td-borders": "currentColor",
+            "--tw-prose-th-borders": "oklch(var(--bc))",
+            "--tw-prose-td-borders": "oklch(var(--bc))",
           } as React.CSSProperties
         }
         variants={containerVariants}
