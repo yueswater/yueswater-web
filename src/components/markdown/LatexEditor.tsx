@@ -77,7 +77,7 @@ export function LatexEditor({ initialCode }: { initialCode: string }) {
               className="flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1 text-xs font-medium hover:bg-muted transition-colors text-foreground"
             >
               <Download className="h-3 w-3" />
-              Download
+              下載
             </button>
           )}
           <button 
@@ -86,7 +86,7 @@ export function LatexEditor({ initialCode }: { initialCode: string }) {
             className="flex items-center gap-1.5 rounded bg-foreground px-3 py-1 text-xs font-medium text-background disabled:opacity-50 hover:opacity-90 transition-opacity"
           >
             {isCompiling ? <Loader2 className="h-3 w-3 animate-spin" /> : <Play className="h-3 w-3 fill-current" />}
-            Compile
+            編譯
           </button>
         </div>
       </div>
