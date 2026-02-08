@@ -60,7 +60,7 @@ export function LatexEditor({ initialCode }: { initialCode: string }) {
     <div className="my-6 overflow-hidden rounded-xl border border-border bg-card shadow-sm text-left w-full">
       <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
         <div className="flex items-center gap-4">
-          <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Local XeLaTeX</span>
+          <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">LaTeX 編輯區</span>
           <select 
             value={lang} 
             onChange={(e) => setLang(e.target.value)}
