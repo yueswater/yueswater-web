@@ -7,6 +7,7 @@ import { LikeSection } from "@/components/features/posts/LikeSection";
 import { BookmarkSection } from "@/components/features/posts/BookmarkSection";
 import { ShareSection } from "@/components/features/posts/ShareSection";
 import { CommentSection } from "@/components/features/posts/CommentSection";
+import { BuyMeCoffee } from "@/components/features/posts/BuyMeCoffee";
 import { getFullImageUrl, processContentImages } from "@/utils/urlHelpers";
 
 const API_URL = (process.env.SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8088/api").replace(/\/$/, "");
@@ -94,7 +95,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
             <ArticleBody content={processContentImages(post.content)} />
           </div>
 
-          <div className="mb-10 mt-12 border-y border-base-200 py-16">
+          <div className="mb-6 mt-12 border-y border-base-200 py-16">
             <div className="flex flex-row items-start justify-center">
               <div className="w-1/3 flex justify-center">
                 <LikeSection
@@ -112,6 +113,10 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                 <BookmarkSection postId={post.id} />
               </div>
             </div>
+          </div>
+
+          <div className="mb-12">
+            <BuyMeCoffee />
           </div>
 
           <CommentSection postId={post.id} slug={post.slug} initialComments={post.comments || []} />
