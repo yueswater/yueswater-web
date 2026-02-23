@@ -11,10 +11,10 @@ export function BuyMeCoffee() {
       href={bmcUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex w-full items-center justify-between rounded-full bg-[#FFDD00]/10 p-4 transition-all hover:bg-[#FFDD00]/20 border border-[#FFDD00]/20"
+      className="group flex w-full flex-col sm:flex-row items-center justify-between rounded-2xl sm:rounded-full bg-[#FFDD00]/10 p-4 transition-all hover:bg-[#FFDD00]/20 border border-[#FFDD00]/20 gap-4"
     >
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FFDD00] text-black shadow-sm transition-transform group-hover:rotate-12">
+      <div className="flex items-center gap-4 w-full sm:w-auto">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#FFDD00] text-black shadow-sm transition-transform group-hover:rotate-12">
           <Coffee className="h-6 w-6" />
         </div>
         <div className="flex flex-col text-left">
@@ -26,7 +26,7 @@ export function BuyMeCoffee() {
           </span>
         </div>
       </div>
-      <div className="rounded-lg bg-[#FFDD00] px-3 py-1 text-[10px] font-black uppercase text-black">
+      <div className="w-full sm:w-auto text-center rounded-2xl bg-[#FFDD00] px-3 py-2 sm:py-1 text-[10px] font-black uppercase text-black">
         贊助支持
       </div>
     </a>

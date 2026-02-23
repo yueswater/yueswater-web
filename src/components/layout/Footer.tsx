@@ -5,29 +5,12 @@ import { FormEvent, useState } from "react";
 import { NewsletterModal } from "@/components/shared/NewsletterModal";
 import { newsletterService } from "@/services/newsletterService";
 import { useToast } from "@/context/ToastContext";
+import Link from "next/link";
 
 export function Footer() {
   const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleInitialSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setIsModalOpen(true);
-  };
-
-  const handleFinalSubscribe = async (nickname: string) => {
-    try {
-      await newsletterService.subscribe(email, nickname);
-      showToast("訂閱成功！請至信箱收取歡迎信", "success");
-      setIsModalOpen(false);
-      setEmail("");
-    } catch (error: any) {
-      showToast(error.message || "訂閱失敗，請稍後再試", "error");
-      throw error;
-    }
-  };
 
   return (
     <>
@@ -38,7 +21,16 @@ export function Footer() {
               <p className="text-foreground text-sm font-semibold">
                 © {new Date().getFullYear()} 岳氏礦泉水
               </p>
-              <p className="text-foreground/60 mt-0.5 text-xs">Powered by Django & Next.js</p>
+              <div className="mt-1 flex items-center justify-center gap-4 md:justify-start">
+                <p className="text-foreground/60 text-xs">Powered by Django & Next.js</p>
+                <span className="text-foreground/20 text-xs">|</span>
+                <Link 
+                  href="/privacy" 
+                  className="text-foreground/60 hover:text-primary text-xs transition-colors"
+                >
+                  隱私權政策
+                </Link>
+              </div>
             </div>
 
             <div className="order-1 flex w-full flex-col items-center gap-4 md:order-2 md:w-auto md:flex-row md:gap-6">
