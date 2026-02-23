@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
+import Script from "next/script";
 
 const notoSansTC = Noto_Sans_TC({
   subsets: ["latin"],
@@ -57,6 +58,14 @@ export default function RootLayout({
       className={`${notoSansTC.variable} ${genJyuuGothic.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4306040064090497"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+      </head>
       <body
         className="bg-background text-foreground font-sans flex min-h-screen flex-col pt-16 antialiased"
       >
