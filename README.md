@@ -1,51 +1,51 @@
-# 岳氏礦泉水的部落格前端
+# Yueswater Blog Frontend
 
-這是[岳氏礦泉水](https://www.yueswater.com/)的視覺呈現與內容編輯介面，基於 **Next.js 15** 與 **Tailwind CSS** 構建。前端實作了具有即時預覽功能的 Markdown 編輯器，並整合了複雜的圖片處理與交互參照邏輯。
+This is the visual presentation and content editing interface for [Yueswater](https://www.yueswater.com/), built with **Next.js 15** and **Tailwind CSS**. The frontend implements a Markdown editor with live preview capabilities, and integrates sophisticated image processing and cross-reference logic.
 
-## 技術組合
+## Tech Stack
 
-* **Next.js 15 (App Router)**：利用伺服器端渲染 (SSR) 提升 SEO 效果，並結合客戶端組件處理互動邏輯。
-* **Tailwind CSS**：配合 **Typography (prose)** 插件進行文章樣式排版，確保 Markdown 內容具備專業的視覺層次。
-* **Framer Motion**：為文章進入與編輯器切換提供流暢的過場動畫。
-* **React Markdown**：支援標準 GFM、數學公式 (Katex) 及原生 HTML 渲染。
-* **Lucide React**：提供編輯器工具列與 UI 介面的圖示支援。
+- **Next.js 15 (App Router)**: Leverages server-side rendering (SSR) for SEO optimization, combined with client components for interactive logic.
+- **Tailwind CSS**: Used alongside the **Typography (prose)** plugin for article layout and styling, ensuring professional visual hierarchy for Markdown content.
+- **Framer Motion**: Provides smooth transition animations for article entry and editor mode switching.
+- **React Markdown**: Supports standard GFM, mathematical expressions (KaTeX), and raw HTML rendering.
+- **Lucide React**: Supplies icons for the editor toolbar and UI components.
 
-## 專案結構
+## Project Structure
 
-本專案將核心邏輯封裝於具備高度重用性的組件中：
+The project encapsulates core logic within highly reusable components.
 
-* `app/admin/write`：核心編輯頁面，整合了自動儲存與快捷鍵功能。
-* `components/features/posts`：包含文章主體渲染 (ArticleBody)、目錄導覽 (TableOfContents) 及互動區。
-* `context`：管理全域狀態，包括身份驗證 (AuthContext) 與通知系統 (ToastContext)。
-* `services`：封裝與後端 API 通訊的異步邏輯。
-* `utils`：提供圖片縮放 (imageHelpers) 與 URL 處理等工具函式。
+- `app/admin/write`: The primary editing page, integrating auto-save and keyboard shortcut support.
+- `components/features/posts`: Contains the article body renderer (`ArticleBody`), table of contents navigation (`TableOfContents`), and interaction panels.
+- `context`: Manages global state, including authentication (`AuthContext`) and the notification system (`ToastContext`).
+- `services`: Encapsulates asynchronous logic for communicating with the backend API.
+- `utils`: Provides utility functions for image scaling (`imageHelpers`) and URL manipulation.
 
-## 核心編輯器功能
+## Core Editor Features
 
-### 智慧圖片處理與交互參照
+### Smart Image Handling and Cross-References
 
-編輯器整合了自定義的圖片上傳模組。上傳時可調整比例，系統會自動抓取原始尺寸並計算目標寬高，最後以 HTML `<img>` 格式插入文章。 透過為每張圖片生成唯一的 `id`，使用者可利用 `[文字](@fig-xxxx)` 語法實作文章內的交互參照跳轉。
+The editor integrates a custom image upload module. During upload, users can adjust the aspect ratio; the system automatically retrieves the original dimensions, computes the target width and height, and inserts the result as an HTML `<img>` tag into the article body. By assigning each image a unique `id`, users can implement in-article cross-reference navigation using the `[label](@fig-xxxx)` syntax.
 
-### 自動編號與渲染邏輯
+### Auto-Numbering and Rendering Logic
 
-渲染引擎內建 CSS 計數器，能自動為文章中的圖片添加「圖 1」、「圖 2」等前綴。 為了確保跨平台顯示一致，透過 `rehype-raw` 解析原生 HTML，並強制移除圖片的所有預設外框與陰影，回歸純粹的內容呈現。
+The rendering engine uses CSS counters to automatically prepend figure labels such as "Figure 1" and "Figure 2" to images within an article. To ensure consistent display across platforms, raw HTML is parsed via `rehype-raw`, and all default borders and shadows on images are explicitly removed to maintain clean, content-focused presentation.
 
-### 寫作保護機制
+### Content Protection Mechanisms
 
-為防止內容遺失，編輯器具備以下機制：
+To prevent content loss, the editor provides the following safeguards.
 
-* **自動儲存**：每 30 秒自動向後端提交當前內容快照。
-* **快捷鍵支援**：支援 `Ctrl+S` (或 `Cmd+S`) 手動觸發草稿儲存。
-* **狀態回復**：透過 JWT 刷新機制，確保編輯過程中的網路請求不因過期而失敗。
+- **Auto-save**: Automatically submits a snapshot of the current content to the backend every 30 seconds.
+- **Keyboard shortcut**: Supports `Ctrl+S` (or `Cmd+S`) to manually trigger a draft save.
+- **Session continuity**: The JWT refresh mechanism ensures that network requests during editing sessions do not fail due to token expiry.
 
-## 環境設定
+## Environment Configuration
 
-請於 `.env.local` 配置以下參數：
+Configure the following variables in `.env.local` before starting the project.
 
-* `NEXT_PUBLIC_API_URL`：指向後端 Django API 的網址。
-* `SERVER_API_URL`：(選填) 用於伺服器端請求的內部網址。
+- `NEXT_PUBLIC_API_URL`: The URL pointing to the backend Django API.
+- `SERVER_API_URL`: *(Optional)* An internal URL used for server-side requests.
 
-## 快速啟動
+## Getting Started
 
 ```bash
 npm install
